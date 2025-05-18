@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:3002/api'; // Replace with your Gateway API URL
+const BASE_URL = 'http://localhost:3000/api'; 
 
 // Generic function to make API requests
 export const fetchData = async (endpoint : any, method = 'GET', data = null) => {
@@ -13,12 +13,10 @@ export const fetchData = async (endpoint : any, method = 'GET', data = null) => 
     return response.data;
   } catch (error) {
     console.error('API Error:', error);
-    // Return fallback mock data in case of network error or backend failure
     return getMockData(endpoint);
   }
 };
 
-// Fallback mock data for different endpoints
 const getMockData = (endpoint: any) => {
   switch (endpoint) {
     case '/users/all':

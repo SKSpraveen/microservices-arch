@@ -29,10 +29,10 @@ export default function DashboardLayout({
   useEffect(() => {
     setIsMounted(true)
     // Check if user is authenticated
-    const isAuthenticated = localStorage.getItem("isAuthenticated") === "true"
-    if (!isAuthenticated) {
-      router.push("/login")
-    }
+    // const isAuthenticated = localStorage.getItem("isAuthenticated") === "true"
+    // if (!isAuthenticated) {
+    //   router.push("/login")
+    // }
   }, [router])
 
   const handleLogout = () => {
@@ -46,7 +46,7 @@ export default function DashboardLayout({
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen bg-gray-50">
+      <div className="flex min-h-screen bg-gray-50 w-full">
         <Sidebar className="border-r border-gray-200">
           <SidebarHeader className="border-b border-gray-200 px-6 py-3">
             <div className="flex items-center gap-2">
@@ -122,7 +122,7 @@ export default function DashboardLayout({
               </div>
             </div>
           </header>
-          <main className="flex-1 overflow-auto p-6">{children}</main>
+          <main className="flex-1 overflow-auto p-6 w-full">{children}</main>
         </div>
       </div>
     </SidebarProvider>

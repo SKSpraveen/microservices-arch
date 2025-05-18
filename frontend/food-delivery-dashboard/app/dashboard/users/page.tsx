@@ -46,22 +46,18 @@ import DriverModal from "@/components/DriverModal";
 import CustomerOrdersModal from "@/components/CustomerOrdersModel";
 import CustomerModal from "@/components/CustomerModel";
 
-// Base URL for the Gateway API
-const BASE_URL = "http://localhost:3002/api"; // Replace with your Gateway API URL
+const BASE_URL = "http://localhost:3000/api"; 
 
-// Fetch data from the backend with fallback logic
 const fetchData = async (endpoint: any) => {
   try {
     const response = await axios.get(`${BASE_URL}${endpoint}`);
     return response.data;
   } catch (error) {
     console.error("API Error:", error);
-    // Return fallback mock data in case of network error or backend failure
     return getMockData(endpoint);
   }
 };
 
-// Fallback mock data for different endpoints
 const getMockData = (endpoint: any) => {
   switch (endpoint) {
     case "/drivers":
@@ -142,27 +138,23 @@ export default function UsersPage() {
     hotelOwners: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+  const [modalOpenDriver, setModalOpenDriver] = useState(false);
   const [driverData, setDriverData] = useState<any>(null);
   const [modalOpenCustomer, setModalOpenCustomer] = useState(false);
   const [customerData, setCustomerData] = useState<any>(null);
   const [orders, setOrders] = useState([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
 
-  // Fetch data from the backend on component mount
   useEffect(() => {
     const fetchAllUsers = async () => {
-      const drivers = await fetchData("/drivers");
-      const customers = await fetchData("/users/all"); // Assuming customers are fetched from /users/all
-      const hotelOwners = await fetchData("/hotelOwners");
+      const drivers = await fetchData("/users/drivers");
+      const customers = await fetchData("/users/all"); 
+      const hotelOwners = await fetchData("/users/hotelOwners");
 
       if (!drivers || !customers || !hotelOwners) {
         alert("Error fetching data. Displaying fallback data.");
       }
-      console.log("drivers");
-      console.log(drivers);
-      console.log("oters");
-      // console.table(customers);
-      // console.table(hotelOwners);
+       console.log("hotels : "+hotelOwners);
 
       setUsers({ drivers: drivers.data, customers, hotelOwners });
     };
@@ -181,18 +173,15 @@ export default function UsersPage() {
     return matchesSearch && matchesStatus;
   });
 
-  // Toggle driver authorization
   const toggleDriverAuthorization = async (driverId: any) => {
     try {
       const driver = users.drivers.find((d: any) => d._id === driverId);
       const newAuthorizationStatus = !driver.isAuthorized;
 
-      // Call the backend to update authorization
       await axios.put(`${BASE_URL}/drivers/${driverId}/authorize`, {
         isAuthorized: newAuthorizationStatus,
       });
 
-      // Update the state locally
       setUsers((prev: any) => ({
         ...prev,
         drivers: prev.drivers.map((d: any) =>
@@ -205,14 +194,13 @@ export default function UsersPage() {
     }
   };
 
-  // View Driver Details
   const viewDriverDetails = async (driverEmail: any) => {
     try {
       const response = await axios.get(
         `${BASE_URL}/users/drivers/${driverEmail}`
       );
       setDriverData(response.data);
-      setModalOpen(true);
+      setModalOpenDriver(true);
     } catch (error) {
       console.error("Failed to fetch driver details:", error);
       alert("Failed to fetch driver details. Please try again.");
@@ -243,7 +231,7 @@ export default function UsersPage() {
   //TODO change the port correctly
   const viewCustomerOrders = async (customerId: string) => {
     try {
-      const response = await axios.get(`http://localhost:5000/orders/user/${customerId}`);
+      const response = await axios.get(`http://localhost:3000/api/orders/user/${customerId}`);
       setOrders(response.data || []);
       setSelectedCustomerId(customerId);
       setModalOpen(true);
@@ -617,7 +605,6 @@ export default function UsersPage() {
                           Joined
                         </TableHead>
                         <TableHead>Status</TableHead>
-                        <TableHead>Hotels</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -661,7 +648,6 @@ export default function UsersPage() {
                                 {owner.isActive ? "Active" : "Inactive"}
                               </Badge>
                             </TableCell>
-                            <TableCell>{owner.hotels}</TableCell>
                             <TableCell className="text-right">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
@@ -697,8 +683,8 @@ export default function UsersPage() {
         </Card>
       </div>
       <DriverModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
+        isOpen={modalOpenDriver}
+        onClose={() => setModalOpenDriver(false)}
         driverData={driverData}
       />
       <CustomerModal

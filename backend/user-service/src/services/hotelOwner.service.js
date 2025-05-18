@@ -2,7 +2,11 @@ import HotelOwner from '../models/HotelOwner.js';
 
 export const getAllHotelOwner = async () => {
   try {
-    const hotelOwners = await HotelOwner.find();
+    const hotelOwners = await HotelOwner.find({}).populate('_id');
+    if (!hotelOwners || hotelOwners.length === 0) {
+      return { success: true, error: 'No hotel owners found' };
+    }
+    console.log(hotelOwners);
     return { success: true, data: hotelOwners };
   } catch (error) {
     return { success: false, error: error.message };

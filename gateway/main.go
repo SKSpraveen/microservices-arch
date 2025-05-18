@@ -5,6 +5,8 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"path"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -12,73 +14,93 @@ import (
 )
 
 func main() {
-	
-	r := gin.Default()
-
+	// Load environment variables
 	err := godotenv.Load()
-    if err != nil {
-        panic("Error loading .env file")
-    }
+	if err != nil {
+		panic("Error loading .env file")
+	}
 
 	env := os.Getenv("ENV")
-    if env == "" {
-        env = "development"
-    }
+	if env == "" {
+		env = "development"
+	}
 
+	// Services
 	authService := os.Getenv("AUTH_SERVICE")
 	userService := os.Getenv("USER_SERVICE")
-    hotelService := os.Getenv("HOTEL_SERVICE")
-    reviewService := os.Getenv("REVIEW_SERVICE")
-    orderService := os.Getenv("ORDER_SERVICE")
-    paymentService := os.Getenv("PAYMENT_SERVICE")
-    notificationService := os.Getenv("NOTIFICATION_SERVICE")
-    searchService := os.Getenv("SEARCH_SERVICE")
+	hotelService := os.Getenv("HOTEL_SERVICE")
+	reviewService := os.Getenv("REVIEW_SERVICE")
+	orderService := os.Getenv("ORDER_SERVICE")
+	paymentService := os.Getenv("PAYMENT_SERVICE")
+	notificationService := os.Getenv("NOTIFICATION_SERVICE")
+	searchService := os.Getenv("SEARCH_SERVICE")
 
-	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://localhost:5001", "http://localhost:5002", "http://localhost:5003"}
-	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
-	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
-	config.AllowCredentials = true
+	// Create router
+	r := gin.Default()
 
-	r.Use(cors.New(config))
+	// CORS config (adjust origin to match frontend port)
+	corsConfig := cors.Config{
+		AllowOrigins:     []string{"http://localhost:5003"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}
+	r.Use(cors.New(corsConfig))
 
+	// Route definitions
 	r.Any("/api/auth/*path", func(c *gin.Context) {
-		proxyRequest(authService, c)
+		proxyRequest(authService, "/api/users", c)
 	})
 
-	r.Any("/api/user/*path", func(c *gin.Context) {
-        proxyRequest(userService, c)
-    })
+	r.Any("/api/users/*path", func(c *gin.Context) {
+		proxyRequest(userService, "/api/users", c)
+	})
 
-    r.Any("/api/hotel/*path", func(c *gin.Context) {
-        proxyRequest(hotelService, c)
-    })
+	r.Any("/api/drivers/*path", func(c *gin.Context) {
+		proxyRequest(userService, "/api/drivers", c)
+	})
 
-    r.Any("/api/review/*path", func(c *gin.Context) {
-        proxyRequest(reviewService, c)
-    })
+	r.Any("/api/hotelOwners/*path", func(c *gin.Context) {
+		proxyRequest(userService, "/api/hotelOwners", c)
+	})
 
-    r.Any("/api/order/*path", func(c *gin.Context) {
-        proxyRequest(orderService, c)
-    })
+	r.Any("/api/hotel/*path", func(c *gin.Context) {
+		proxyRequest(hotelService, "/api/users", c)
+	})
 
-    r.Any("/api/payment/*path", func(c *gin.Context) {
-        proxyRequest(paymentService, c)
-    })
+	r.Any("/api/review/*path", func(c *gin.Context) {
+		proxyRequest(reviewService, "/api/users", c)
+	})
 
-    r.Any("/api/notification/*path", func(c *gin.Context) {
-        proxyRequest(notificationService, c)
-    })
+	r.Any("/api/order/*path", func(c *gin.Context) {
+		proxyRequest(orderService, "/api/users", c)
+	})
 
-    r.Any("/api/search/*path", func(c *gin.Context) {
-        proxyRequest(searchService, c)
-    })
+	r.Any("/api/payment/*path", func(c *gin.Context) {
+		proxyRequest(paymentService, "/api/users", c)
+	})
 
-    r.Run(":8000")
+	r.Any("/api/notification/*path", func(c *gin.Context) {
+		proxyRequest(notificationService, "/api/users", c)
+	})
 
+	r.Any("/api/search/*path", func(c *gin.Context) {
+		proxyRequest(searchService, "/api/users", c)
+	})
+
+	// Run server on port 3000
+	r.Run(":3000")
 }
 
-func proxyRequest(target string, c *gin.Context) {
+// Proxies incoming requests to the target service
+func proxyRequest(target string, prefix string, c *gin.Context) {
+	if c.Request.Method == http.MethodOptions {
+		c.Status(http.StatusOK)
+		return
+	}
+
 	remote, err := url.Parse(target)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse target URL"})
@@ -86,12 +108,20 @@ func proxyRequest(target string, c *gin.Context) {
 	}
 
 	proxy := httputil.NewSingleHostReverseProxy(remote)
+
 	proxy.Director = func(req *http.Request) {
-		req.Header = c.Request.Header
-		req.Host = remote.Host
 		req.URL.Scheme = remote.Scheme
 		req.URL.Host = remote.Host
-		req.URL.Path = c.Param("path")
+		req.URL.Path = path.Join(prefix, c.Param("path"))
+		req.Host = remote.Host
+
+		// Copy headers safely
+		req.Header = make(http.Header)
+		for key, values := range c.Request.Header {
+			for _, value := range values {
+				req.Header.Add(key, value)
+			}
+		}
 	}
 
 	proxy.ServeHTTP(c.Writer, c.Request)

@@ -406,7 +406,7 @@ app.post('/orders/:orderId/deliver', async (req, res) => {
 });
 
 // Start the server
-const PORT = 5000;
+const PORT = 3005;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

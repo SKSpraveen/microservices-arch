@@ -16,12 +16,12 @@ dotenv.config();
 const app = express();
 
 // Middleware setup
-app.use(cors({
-  origin: 'http://localhost:3000',
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE"],
+// app.use(cors({
+//   origin: 'http://localhost:3000',
+//   credentials: true,
+//   methods: ["GET", "POST", "PUT", "DELETE"],
 
-}));
+// }));
 app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
@@ -34,10 +34,11 @@ app.use(cookieParser());
 })();
 
 // Routes setup
-app.use('/api/users', userRoutes);
-app.use('/api', adminRoutes);
-app.use('/api', driverRoutes);
 app.use('/api', hotelOwnerRoutes);
+app.use('/api', driverRoutes);
+app.use('/api', userRoutes);
+app.use('/api', adminRoutes);
+
 
 app.put('/api/drivers/:id/authorize', async (req, res) => {
   const { id } = req.params;
