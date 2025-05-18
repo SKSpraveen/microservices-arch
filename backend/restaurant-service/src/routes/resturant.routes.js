@@ -9,6 +9,9 @@ router.post("/",hotelController.createHotel);
 // Get a single hotel by ID
 router.get("/getById/:id", hotelController.getHotel);
 
+// Get a single hotel by ID
+router.get("/getByUserId/:id", hotelController.getHotelByUserId);
+
 // Get all hotels (with filtering and search)
 router.get("/", hotelController.getAllHotels);
 
