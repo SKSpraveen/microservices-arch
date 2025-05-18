@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAllDriversController,getDriverByIdController,deleteDriverController,updateDriverController} from '../controllers/driver.controller.js'
+import { getAllDriversController,getDriverByIdController,deleteDriverController,updateDriverController, updateAuthCertificatesByEmailController} from '../controllers/driver.controller.js'
 
 
 const router = express.Router(); 
@@ -13,5 +13,7 @@ router.get('/users/drivers', getAllDriversController);  // router.get('/drivers'
 router.get('/users/drivers/:email', getDriverByIdController);  // router.get('/drivers/:id', authMiddleware , getDriverByIdController);
 router.put('/users/drivers/:id', updateDriverController);  // router.put('/drivers/:id', authMiddleware , updateDriverController);
 router.delete('/users/drivers/:id', deleteDriverController);  // router.delete('/drivers/:id', authMiddleware , deleteDriverController);
+router.put('/users/drivers/addVehicle/:email',updateAuthCertificatesByEmailController)
+
 
 export default router;
