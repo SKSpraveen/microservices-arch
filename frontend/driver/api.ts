@@ -6,10 +6,10 @@ import { getCurrentUserRole } from "./config";
 const IS_DEV = process.env.NODE_ENV === "development";
 
 const SERVICE_PORTS = {
-  auth: 3001,
-  users: 3002,
-  hotel: 3003,
-  review: 3004,
+  auth: 3000,
+  users: 3000,
+  hotel: 3000,
+  review: 3000,
 } as const;
 
 type Service = keyof typeof SERVICE_PORTS;
