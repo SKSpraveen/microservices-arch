@@ -17,7 +17,7 @@ const app = express();
 
 // Middleware setup
 app.use(cors({
-  origin: 'http://localhost:3005',
+  origin: 'http://localhost:3000',
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE"],
 
@@ -34,7 +34,7 @@ app.use(cookieParser());
 })();
 
 // Routes setup
-app.use('/api', userRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api', adminRoutes);
 app.use('/api', driverRoutes);
 app.use('/api', hotelOwnerRoutes);
