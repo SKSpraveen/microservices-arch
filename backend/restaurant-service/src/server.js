@@ -9,6 +9,8 @@ const resturantRoutes = require("./routes/resturant.routes");
 const foodItemsRoutes = require("./routes/foodItems.route");
 const flashDealsRoutes = require("./routes/flashDeals.route");
 
+const { authorizeHotel, revokeHotel } = require("./controllers/resturant.controller");
+
 dotenv.config();
 
 const app = express();
@@ -30,6 +32,9 @@ app.use(cookieParser());
 (async () => {
   await dbConnection();  
 })();
+
+app.post("/api/hotel/authorizeHotel", authorizeHotel);
+app.post("/api/hotel/revokeHotel", revokeHotel);
 
 // Routes setup
 app.use('/api/hotel',resturantRoutes);
