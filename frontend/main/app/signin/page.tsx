@@ -97,6 +97,10 @@ export default function LoginPage() {
 
       // Save token in local storage
       localStorage.setItem("authToken", response.data.token);
+      console.log('====================================');
+      console.log("Login successful:", response.data);
+      console.log('====================================');
+      localStorage.setItem("isLoggedIn", "true");
 
       // Redirect to the restaurants page
       router.push("/restaurants");
