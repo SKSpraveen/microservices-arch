@@ -21,12 +21,9 @@ export default function LoginPage() {
     e.preventDefault()
     setIsLoading(true)
 
-    // Simulate API call
     setTimeout(() => {
-      // Hardcoded credentials check
       if (email === "admin@fooddelivery.com" && password === "admin123") {
-        // Store auth state in localStorage
-        localStorage.setItem("isAuthenticated", "true")
+        // Store auth state in localStorage localStorage.setItem("isAuthenticated", "true")
         router.push("/dashboard")
       } else {
         alert("Invalid credentials. Use admin@fooddelivery.com / admin123")

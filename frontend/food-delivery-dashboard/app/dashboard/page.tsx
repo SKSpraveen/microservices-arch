@@ -22,12 +22,12 @@ import { ArrowUpRight, UsersIcon, HotelIcon, PackageIcon, DollarSign } from "luc
 export default function DashboardPage() {
   // Mock data for charts
   const orderData = [
-    { name: "Mon", orders: 12 },
+    { name: "Mon", orders: 1 },
     { name: "Tue", orders: 19 },
-    { name: "Wed", orders: 15 },
-    { name: "Thu", orders: 22 },
+    { name: "Wed", orders: 10 },
+    { name: "Thu", orders: 2 },
     { name: "Fri", orders: 30 },
-    { name: "Sat", orders: 40 },
+    { name: "Sat", orders: 4 },
     { name: "Sun", orders: 25 },
   ]
 
@@ -40,14 +40,14 @@ export default function DashboardPage() {
   const COLORS = ["#8b5cf6", "#c084fc", "#d8b4fe"]
 
   const revenueData = [
-    { name: "Week 1", revenue: 12000 },
-    { name: "Week 2", revenue: 19000 },
-    { name: "Week 3", revenue: 15000 },
-    { name: "Week 4", revenue: 22000 },
+    { name: "Week 1", revenue: 200 },
+    { name: "Week 2", revenue: 0 },
+    { name: "Week 3", revenue: 550 },
+    { name: "Week 4", revenue: 2200 },
   ]
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-gray-900">Dashboard</h1>
         <p className="text-gray-500">Overview of your food delivery system</p>
@@ -63,7 +63,7 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-500">Total Users</p>
-                  <h3 className="text-2xl font-bold">745</h3>
+                  <h3 className="text-2xl font-bold">45</h3>
                 </div>
               </div>
               <div className="flex items-center text-green-500 text-sm font-medium">
@@ -83,7 +83,7 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-500">Active Hotels</p>
-                  <h3 className="text-2xl font-bold">85</h3>
+                  <h3 className="text-2xl font-bold">15</h3>
                 </div>
               </div>
               <div className="flex items-center text-green-500 text-sm font-medium">
@@ -103,7 +103,7 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-500">Total Orders</p>
-                  <h3 className="text-2xl font-bold">1,248</h3>
+                  <h3 className="text-2xl font-bold">48</h3>
                 </div>
               </div>
               <div className="flex items-center text-green-500 text-sm font-medium">
@@ -123,7 +123,7 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-500">Revenue</p>
-                  <h3 className="text-2xl font-bold">$24,780</h3>
+                  <h3 className="text-2xl font-bold">$3350</h3>
                 </div>
               </div>
               <div className="flex items-center text-green-500 text-sm font-medium">

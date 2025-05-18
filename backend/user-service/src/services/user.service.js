@@ -4,6 +4,9 @@ import User from '../models/User.js';
 export const getAllUsers = async () => {
   try {
     const users = await User.find();
+    if(!users || users.length === 0) {
+      return { success: true, error: 'No users found' };
+    }
     return { success: true, data: users };
   } catch (error) {
     return { success: false, error: error.message };
