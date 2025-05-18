@@ -151,7 +151,7 @@ export default function FoodItemPage() {
       {/* Header Section */}
       <div className="relative h-[300px] md:h-[400px] bg-gray-100 dark:bg-dark-800 overflow-hidden">
         <Image
-          src={foodItem?.image || getFallbackImage()}
+          src={foodItem?.images || getFallbackImage()}
           alt={foodItem?.foodName ||'missing alt'}
           fill
           className="object-cover"
