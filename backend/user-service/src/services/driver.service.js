@@ -10,19 +10,27 @@ export const getAllDrivers = async ()=> {
   }
 };
 
-export const getDriverById = async (id)=> {
+export const getDriverById = async (email) => {
+  console.log('email on service',email);
+  
   try {
-    const drivers = await Driver.findById(id);
-    return drivers 
-      ? { success: true, data: drivers } 
-      : { success: false, error: 'User not found' };
+    const driver = await Driver.findOne({ email });
+    console.log('driver',driver);
+    
+    if (!driver) {
+      return { success: false, error: 'Driver not found' };
+    }
+
+    return { success: true, data: driver };
   } catch (error) {
     return { success: false, error: error.message };
   }
 };
 
+
 export const updateDriver = async (id, data)=> {
   try {
+    console.log(id, data)
     const drivers = await Driver.findByIdAndUpdate(id, data, { new: true });
     return drivers 
       ? { success: true, data: drivers } 

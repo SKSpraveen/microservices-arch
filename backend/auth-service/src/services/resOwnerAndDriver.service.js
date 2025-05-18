@@ -169,7 +169,7 @@ export const activateAccount = async (activationData, req, role) => {
       const existingSession = await Session.findOne({ userId: user[0]._id, deviceInfo: deviceInfoString });
   
       if (existingSession && existingSession.expiresIn > Date.now()) {
-        return { success: true, message: 'Session already active on this device.', token: existingSession.token, role: user[0].role };
+        return { success: true, message: 'Session already active on this device.', token: existingSession.token, role: user[0].role ,email:user[0].email};
       }
   
       const token = await generateToken({ id: user[0]._id });
@@ -190,7 +190,7 @@ export const activateAccount = async (activationData, req, role) => {
       );
       console.log(user[0])
   
-      return { success: true, token, role: user[0].role, session: newSession };
+      return { success: true, token, role: user[0].role, session: newSession ,email:user[0].email};
     } catch (error) {
       console.error(error);
       throw error;

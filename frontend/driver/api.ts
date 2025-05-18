@@ -254,7 +254,7 @@ export interface Restaurant {
   ordersCount: number;
   isFeatured: boolean;
   price: string;
-  banners: string;
+  banner: string;
   categoriesprovider: string[];
   image: string;
   featured: boolean;
@@ -423,6 +423,20 @@ export const getUserProfileById = async (id: string): Promise<any> => {
   }
 };
 
+export const getDriverProfileById = async (email: string): Promise<any> => {
+  try {
+    console.log(userAPI);
+    
+    const response = await userAPI.get(`/drivers/${email}`); 
+    if (response.status === 200) {
+      return response.data; 
+    }
+    throw new Error(response.data.message || "Failed to fetch user profile.");
+  } catch (error: any) {
+    console.error("Get User Profile Failed:", error);
+    throw error;
+  }
+};
 
 export async function getReviewsByFoodId(foodId: string) { /* backend fetch */ }
 export async function fetchRelatedItems(foodId: string) { /* backend fetch */ }

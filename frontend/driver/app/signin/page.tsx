@@ -81,8 +81,7 @@ export default function LoginPage() {
 		setIsLoading(true);
 		try {
 			const response: any = await login(formData);
-
-			console.log("response", response.data.role);
+      		sessionStorage.setItem("userEmail", response.data.email);
 			const userRole = response.data.role;
 			localStorage.setItem("userRole", userRole);
 			if (response.data.message === "Session already active on this device") {

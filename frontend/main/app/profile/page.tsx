@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Camera, Edit, Loader } from "lucide-react";
 import { getUserProfile, updateProfile, deleteUserAccount } from "@/api";
 import { placeholder } from "@/hooks/utilConsts";
+import axios from "axios";
 
 export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -112,6 +113,27 @@ export default function ProfilePage() {
     }));
   };
 
+  const handleImageUpload = async (file: File) => {
+    try {
+      const data = new FormData();
+      data.append('file', file);
+      data.append('upload_preset', 'user_profile_photos');
+  
+      const cloudinaryRes = await axios.post(
+        'https://api.cloudinary.com/v1_1/dxhzkog1c/image/upload',
+        data
+      );
+  
+      setProfileData(prev => ({
+        ...prev,
+        avatar: cloudinaryRes.data.secure_url
+      }));
+    } catch (error) {
+      console.error('Failed to upload image:', error);
+      alert('Failed to upload image. Please try again.');
+    }
+  };
+
   const handleSaveProfile = async () => {
     setIsLoading(true);
     try {
@@ -135,6 +157,8 @@ export default function ProfilePage() {
       }
     }
   };
+
+  
 
   console.log(profileData)
 
@@ -160,14 +184,30 @@ export default function ProfilePage() {
                   className="object-cover"
                 />
               </div>
-              <button className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center shadow-lg hover:bg-purple-700 transition-colors">
-                <Camera className="w-4 h-4" />
-              </button>
+              <div className="relative">
+                <input
+                  type="file"
+                  id="avatar"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      handleImageUpload(file);
+                    }
+                  }}
+                />
+                <button 
+                  onClick={() => document.getElementById('avatar')?.click()}
+                  className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center shadow-lg hover:bg-purple-700 transition-colors"
+                >
+                  <Camera className="w-4 h-4" />
+                </button>
+              </div>
             </div>
             <div className="text-center sm:text-left">
               <h3 className="text-2xl font-bold">{profileData.username}</h3>
               <p className="text-gray-600 dark:text-gray-400">{profileData.email}</p>
-              <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Member since April 2023</p>
             </div>
           </div>
           <div className="h-px bg-gray-200 dark:bg-gray-700 my-6"></div>
@@ -224,7 +264,7 @@ export default function ProfilePage() {
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
               />
             </div>
-            {/* <div className="space-y-2 sm:col-span-2">
+             <div className="space-y-2 sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Address</label>
               {profileData.address.map((addr, index) => (
                 <div key={index} className="flex items-center gap-2">
@@ -249,7 +289,7 @@ export default function ProfilePage() {
               >
                 Add Address
               </button>
-            </div> */}
+            </div> 
             <div className="space-y-2 sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Allergies</label>
               {profileData.alergy.map((allergy, index) => (

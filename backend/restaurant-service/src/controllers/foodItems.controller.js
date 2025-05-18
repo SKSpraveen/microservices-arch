@@ -8,12 +8,12 @@ const Food = require("../models/foodItems.model");
 // Create a new food item
 exports.createFood = async (req, res) => {
   try {
-    const { categoryName, foodName, image, price, description, isAvailable, isOfferAvailable, hotelID } = req.body;
+    const { categoryName, foodName, images, price, description, isAvailable, isOfferAvailable, hotelID } = req.body;
     const newFood = new Food({
       hotelID:hotelID,
       categoryName,
       foodName,
-      image,
+      images,
       price,
       description,
       isAvailable,

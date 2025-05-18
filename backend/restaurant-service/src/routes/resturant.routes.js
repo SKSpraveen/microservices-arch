@@ -13,7 +13,7 @@ router.get("/getById/:id", hotelController.getHotel);
 router.get("/", hotelController.getAllHotels);
 
 // Update a hotel by ID
-router.put("/update/:id", authGuard, hotelController.updateHotel); // Fixed missing "/"
+router.put("/update/:id", hotelController.updateHotel); // Fixed missing "/"
 
 // Delete a hotel by ID
 router.delete("/:id", hotelController.deleteHotel);

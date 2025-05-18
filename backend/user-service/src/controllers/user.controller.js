@@ -9,6 +9,9 @@ import {
 
 export const getAllUsersController = async (req, res) => {
   const result = await getAllUsers();
+  if(result.success && result.data.length === 0) {
+    return res.status(200).json({ error: 'No users found' });
+  }
   result.success 
     ? res.status(200).json(result.data)
     : res.status(500).json({ error: result.error });

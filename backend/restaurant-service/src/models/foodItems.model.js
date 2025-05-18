@@ -5,7 +5,7 @@ const FoodSchema = new mongoose.Schema(
     hotelID: { type: String, required: true },
     categoryName: { type: String, required: true },
     foodName: { type: String, required: true },
-    images: [{ type: String, default: [] }], 
+    images: { type: String, default: "https://i.pinimg.com/564x/de/64/1b/de641b58d8bcf05e4b5117adaf0cbf61.jpg" }, 
     price: { type: Number, required: true },
     description: { type: String, default: "" },
     prepTime: { type: String, default: "" }, 
@@ -34,14 +34,6 @@ const FoodSchema = new mongoose.Schema(
         ],
       },
     ],
-    extras: [
-      {
-        id: { type: String, required: true },
-        name: { type: String, required: true },
-        price: { type: Number, default: 0 },
-        images: [{ type: String, default: [] }], // Images for each extra
-      },
-    ],
     relatedItems: [
       {
         id: { type: String, required: true },
@@ -51,7 +43,6 @@ const FoodSchema = new mongoose.Schema(
         image: { type: String, default: "default_banner_image_url" },
       },
     ],
-    restaurantName: { type: String, required: true },
     rating: { type: Number },
   },
   

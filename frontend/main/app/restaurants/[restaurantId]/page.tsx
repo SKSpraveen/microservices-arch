@@ -80,45 +80,46 @@ export default function RestaurantMenuPage() {
         setRestaurant(restaurantData);
 
         // Fetch reviews
-        const reviewsData = await fetchRestaurantReviews(
-          params.restaurantId as string
-        );
+        // const reviewsData = await fetchRestaurantReviews(
+        //   params.restaurantId as string
+        // );
 
-        // Filter reviews that have a userId
-        const reviewsWithUserId = reviewsData.filter(
-          (review: any) => review.userId
-        );
+        // // Filter reviews that have a userId
+        // const reviewsWithUserId = reviewsData.filter(
+        //   (review: any) => review.userId
+        // );
 
         // Fetch user profiles in parallel
-        const userProfiles = await Promise.all(
-          reviewsWithUserId.map((review: any) =>
-            getUserProfileById(review.userId)
-          )
-        );
+        // const userProfiles = await Promise.all(
+        //   reviewsWithUserId.map((review: any) =>
+        //     getUserProfileById(review.userId)
+        //   )
+        // );
 
-        // Merge user data back into reviews
-        const enrichedReviews = reviewsData.map(
-          (review: any, index: number) => {
-            if (review.userId) {
-              const userProfile = userProfiles.find(
-                (profile) => profile._id === review.userId
-              );
-              return { ...review, userData: userProfile };
-            }
-            return review;
-          }
-        );
+        // // Merge user data back into reviews
+        // const enrichedReviews = reviewsData.map(
+        //   (review: any, index: number) => {
+        //     if (review.userId) {
+        //       const userProfile = userProfiles.find(
+        //         (profile) => profile._id === review.userId
+        //       );
+        //       return { ...review, userData: userProfile };
+        //     }
+        //     return review;
+        //   }
+        // );
 
-        setReviews(enrichedReviews);
+        // setReviews(enrichedReviews);
 
         // Calculate distance and delivery time
         calculateDistanceAndTime(restaurantData.hotelAddress);
 
         // Fetch menu items
-        // Step 1: Fetch menu items
         const menuData = await fetchRestaurantMenuItems(
           params.restaurantId as string
         );
+
+        console.log("fuck you : "+menuData.data);
 
         // Step 2: For each menu item, fetch its flash deal
         const enrichedMenu: any[] = [];
@@ -410,12 +411,12 @@ export default function RestaurantMenuPage() {
             <div className="flex gap-4">
               {/* Image + Badge */}
               <div className="relative h-24 w-24 rounded-xl overflow-hidden flex-shrink-0">
-                <Image
-                  src={ typeof(item.image)=== "string" ? item.image : item.image[0]}
+                 <img
+                  src={item.images}
                   alt={item.foodName}
-                  fill
+                  
                   className="object-cover transition-transform duration-300 group-hover:scale-110"
-                />
+                /> 
                 {item.isOfferAvailable && (
                   <div className="absolute top-1 left-1">
                     <span className="badge bg-red-500 text-white text-xs">Flash Deal</span>
@@ -470,9 +471,9 @@ export default function RestaurantMenuPage() {
                 </div>
 
                 {/* Ratings */}
-                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {/* <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   {item.ratingID.length} Rating{item.ratingID.length !== 1 ? "s" : ""}
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
