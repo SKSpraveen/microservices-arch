@@ -169,7 +169,7 @@ export const activateAccount = async (activationData, req, role) => {
       const existingSession = await Session.findOne({ userId: user[0]._id, deviceInfo: deviceInfoString });
   
       if (existingSession && existingSession.expiresIn > Date.now()) {
-        return { success: true, message: 'Session already active on this device.', token: existingSession.token, role: user[0].role ,email:user[0].email};
+        return { success: true, message: 'Session already active on this device.', token: existingSession.token, role: user[0].role ,email:user[0].email, userId: user[0]._id};
       }
   
       const token = await generateToken({ id: user[0]._id });
@@ -190,7 +190,7 @@ export const activateAccount = async (activationData, req, role) => {
       );
       console.log(user[0])
   
-      return { success: true, token, role: user[0].role, session: newSession ,email:user[0].email};
+      return { success: true, token, role: user[0].role, session: newSession ,email:user[0].email,  userId: user[0]._id};
     } catch (error) {
       console.error(error);
       throw error;
@@ -271,11 +271,21 @@ export const activateAccount = async (activationData, req, role) => {
   // ========== FORGOT PASSWORD ==========
   export const forgotPassword = async (email, role) => {
     try {
-      if (!email || !role) throw new ApiError(400, 'Missing email or role.');
+      if (!email ) throw new ApiError(400, 'Missing email');
   
-      const Model = getModelByRole(role);
-      const user = await Model.findOne({ email });
-  
+      let user = await Driver.find({email: email});
+     console.log("user",user);
+     
+      if ( !user[0]) {
+        console.log("inside user first");
+        
+        user = await RestaurantOwner.find({email: email});
+        if(!user) {
+            console.log("inside user");
+            
+            return { success: false, message: 'no user found'};
+        }
+      }
       if (!user) throw new ApiError(404, `${role} not found.`);
   
       const otp = (await generateOTP()).toString();
@@ -297,11 +307,11 @@ export const activateAccount = async (activationData, req, role) => {
   // ========== RESET PASSWORD ==========
   export const resetPassword = async (password, email, otp, role) => {
     try {
-      if (!password || !email || !otp || !role) {
+      if (!password || !email || !otp ) {
         throw new ApiError(400, 'Missing reset data.');
       }
   
-      const Model = getModelByRole(role);
+      //const Model = getModelByRole(role);
       const storedOTP = await OTP.findOne({ email });
   
       if (!storedOTP || storedOTP.otp !== otp) {
@@ -309,9 +319,17 @@ export const activateAccount = async (activationData, req, role) => {
       }
   
       await OTP.deleteMany({ email });
-  
-      const user = await Model.findOne({ email });
-      if (!user) throw new ApiError(404, `${role} not found.`);
+      let user;
+      const driver = await Driver.findOne({ email });
+      
+      let hotelOwner;
+      if (!driver) {
+        hotelOwner = RestaurantOwner.findOne({email})
+        if(!hotelOwner) throw new Error ("no user found")
+          user = hotelOwner
+      } else {
+        user = driver
+      }
       if (!user.isActive) throw new ApiError(403, 'Activate your account first.');
   
       user.password = (await hashPassword(password)).toString();

@@ -48,3 +48,21 @@ export const deleteDriver = async (id)=> {
     return { success: false, error: error.message };
   }
 };
+
+export const updateAuthCertificatesByEmail = async (email, certificatesData) => {
+  try {
+    const updatedDriver = await Driver.findOneAndUpdate(
+      { email }, // Find driver by email
+      { $set: { authCertificates: certificatesData } },
+      { new: true }
+    );
+
+    if (!updatedDriver) {
+      return { success: false, error: "Driver not found" };
+    }
+
+    return { success: true, data: updatedDriver };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
