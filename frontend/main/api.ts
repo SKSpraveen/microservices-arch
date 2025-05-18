@@ -197,7 +197,7 @@ export const logout = async (): Promise<void> => {
 
 export const getUserProfile = async (): Promise<any> => {
   try {
-    const response = await userAPI.get("/users"); 
+    const response = await userAPI.get("/"); 
     if (response.status === 200) {
       return response.data; 
     }
@@ -210,7 +210,7 @@ export const getUserProfile = async (): Promise<any> => {
 
 export const updateProfile = async (updatedData: any): Promise<any> => {
   try {
-    const response = await userAPI.put("/users", updatedData); 
+    const response = await userAPI.put("/", updatedData); 
     if (response.status === 200) {
       return response.data;
     }
@@ -223,7 +223,7 @@ export const updateProfile = async (updatedData: any): Promise<any> => {
 
 export const deleteUserAccount = async (): Promise<void> => {
   try {
-    const response = await userAPI.delete("/users"); 
+    const response = await userAPI.delete("/"); 
     if (response.status === 204) {
       window.location.href = "/"; 
     } else {
