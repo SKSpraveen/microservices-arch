@@ -40,7 +40,7 @@ func main() {
 
 	// CORS config (adjust origin to match frontend port)
 	corsConfig := cors.Config{
-		AllowOrigins:     []string{"http://localhost:5003"},
+		AllowOrigins:     []string{"http://localhost:5003", "http://localhost:5001", "http://localhost:5002"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
@@ -51,7 +51,7 @@ func main() {
 
 	// Route definitions
 	r.Any("/api/auth/*path", func(c *gin.Context) {
-		proxyRequest(authService, "/api/users", c)
+		proxyRequest(authService, "/api/auth", c)
 	})
 
 	r.Any("/api/users/*path", func(c *gin.Context) {
@@ -67,7 +67,7 @@ func main() {
 	})
 
 	r.Any("/api/hotel/*path", func(c *gin.Context) {
-		proxyRequest(hotelService, "/api/users", c)
+		proxyRequest(hotelService, "/api/hotel", c)
 	})
 
 	r.Any("/api/review/*path", func(c *gin.Context) {

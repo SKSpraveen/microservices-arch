@@ -45,8 +45,9 @@ import axios from "axios";
 import DriverModal from "@/components/DriverModal";
 import CustomerOrdersModal from "@/components/CustomerOrdersModel";
 import CustomerModal from "@/components/CustomerModel";
+import { HotelOwnerPopup } from "@/components/HotelOwnerPopup";
 
-const BASE_URL = "http://localhost:3000/api"; 
+const BASE_URL = "http://localhost:3000/api";
 
 const fetchData = async (endpoint: any) => {
   try {
@@ -143,18 +144,22 @@ export default function UsersPage() {
   const [modalOpenCustomer, setModalOpenCustomer] = useState(false);
   const [customerData, setCustomerData] = useState<any>(null);
   const [orders, setOrders] = useState([]);
-  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(
+    null
+  );
+  const [ownerId, setOwnerId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchAllUsers = async () => {
       const drivers = await fetchData("/users/drivers");
-      const customers = await fetchData("/users/all"); 
+      const customers = await fetchData("/users/all");
       const hotelOwners = await fetchData("/users/hotelOwners");
 
       if (!drivers || !customers || !hotelOwners) {
         alert("Error fetching data. Displaying fallback data.");
       }
-       console.log("hotels : "+hotelOwners);
+      console.log("hotels : " + hotelOwners);
 
       setUsers({ drivers: drivers.data, customers, hotelOwners });
     };
@@ -231,7 +236,9 @@ export default function UsersPage() {
   //TODO change the port correctly
   const viewCustomerOrders = async (customerId: string) => {
     try {
-      const response = await axios.get(`http://localhost:3000/api/orders/user/${customerId}`);
+      const response = await axios.get(
+        `http://localhost:3000/api/orders/user/${customerId}`
+      );
       setOrders(response.data || []);
       setSelectedCustomerId(customerId);
       setModalOpen(true);
@@ -575,11 +582,16 @@ export default function UsersPage() {
                                     View Orders
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
-                                    onClick={() => deactivateCustomer(customer._id, customer.isActive)}
+                                    onClick={() =>
+                                      deactivateCustomer(
+                                        customer._id,
+                                        customer.isActive
+                                      )
+                                    }
                                   >
-                                   {
-                                    customer.isActive ? "Deactivate" : "Activate"
-                                  }
+                                    {customer.isActive
+                                      ? "Deactivate"
+                                      : "Activate"}
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
@@ -638,7 +650,7 @@ export default function UsersPage() {
                                     : "secondary"
                                 }
                                 className={
-                                  owner.isActive 
+                                  owner.isActive
                                     ? "bg-green-100 text-green-800 hover:bg-green-100"
                                     : !owner.isActive
                                     ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
@@ -662,10 +674,11 @@ export default function UsersPage() {
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                   <DropdownMenuSeparator />
-                                  <DropdownMenuItem>
-                                    View Details
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => {setPopupOpen(true)
+                                      setOwnerId(owner._id)
+                                    }}
+                                  >
                                     View Hotels
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
@@ -697,6 +710,7 @@ export default function UsersPage() {
         onClose={() => setModalOpen(false)}
         orders={orders}
       />
+      <HotelOwnerPopup id={ownerId as string} open={popupOpen} onOpenChange={setPopupOpen} />
     </div>
   );
 }

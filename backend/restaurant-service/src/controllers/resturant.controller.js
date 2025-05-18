@@ -15,6 +15,7 @@ exports.createHotel = async (req, res) => {
       categoriesprovider,
       cousinProvided,
       isFeatured,
+      userID
     } = req.body;
 
     // Validate required fields
@@ -23,7 +24,7 @@ exports.createHotel = async (req, res) => {
     }
     
     const newHotel = new Hotel({
-      userID: "123",
+      userID,
       hotelName,
       hotelAddress,
       metaData,
@@ -50,6 +51,16 @@ exports.createHotel = async (req, res) => {
 exports.getHotel = async (req, res) => {
   try {
     const hotel = await Hotel.findById(req.params.id);
+    if (!hotel) return res.status(404).json({ message: "Hotel not found" });
+    res.status(200).json(hotel);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getHotelByUserId = async (req, res) => {
+  try {
+    const hotel = await Hotel.find({userId: req.params.userId});
     if (!hotel) return res.status(404).json({ message: "Hotel not found" });
     res.status(200).json(hotel);
   } catch (error) {
