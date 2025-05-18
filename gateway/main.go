@@ -96,10 +96,10 @@ func main() {
 
 // Proxies incoming requests to the target service
 func proxyRequest(target string, prefix string, c *gin.Context) {
-	if c.Request.Method == http.MethodOptions {
-		c.Status(http.StatusOK)
-		return
-	}
+	// if c.Request.Method == http.MethodOptions {
+	// 	c.Status(http.StatusOK)
+	// 	return
+	// }
 
 	remote, err := url.Parse(target)
 	if err != nil {
