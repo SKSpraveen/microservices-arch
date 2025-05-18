@@ -15,12 +15,12 @@ dotenv.config();
 const app = express();
 
 // Middleware setup
-app.use(cors({
-  origin: 'http://localhost:3000',
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE"],
+// app.use(cors({
+//   origin: 'http://localhost:3000',
+//   credentials: true,
+//   methods: ["GET", "POST", "PUT", "DELETE"],
 
-}));
+// }));
 app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
