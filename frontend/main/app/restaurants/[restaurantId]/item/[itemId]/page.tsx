@@ -28,6 +28,8 @@ export default function FoodItemPage() {
   const [isFavorite, setIsFavorite] = useState(false);
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [cartAvailable, setCartAvailable] = useState(false);
+  
 
   const itemId = params.itemId as string;
 
@@ -47,7 +49,7 @@ export default function FoodItemPage() {
 
         // Fetch hotel name
         const hotelData = await fetchRestaurantById(foodItemData.hotelID);
-        setHotelName(hotelData.name);
+        setHotelName(hotelData.hotelName);
 
         // Fetch related items dynamically
         // const relatedItemsData = await Promise.all(
@@ -100,10 +102,35 @@ export default function FoodItemPage() {
   const handleDecreaseQuantity = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
 
   // Handle Add to Cart
-  const handleAddToCart = () => {
+  const handleCartToggle = () => {
+  const cartItems = JSON.parse(localStorage.getItem("cartItems") || "[]");
+  const existingItemIndex = cartItems.findIndex(
+    (item: any) => item.id === foodItem?._id
+  );
+
+  if (existingItemIndex !== -1) {
+    // Item exists — remove it
+    cartItems.splice(existingItemIndex, 1);
+    setCartAvailable(false);
+    alert(`${foodItem?.foodName} removed from cart!`);
+  } else {
+    // Item doesn't exist — add it
+    const cartItem = {
+      price: foodItem?.price * quantity,
+      name: foodItem?.foodName,
+      quantity: quantity,
+      id: foodItem?._id,
+      foodImage: foodItem?.images,
+      hotelId: foodItem?.hotelID,
+    };
+    cartItems.push(cartItem);
+    setCartAvailable(true);
     alert(`${quantity} x ${foodItem?.foodName} added to cart!`);
-    // Implement cart logic here (e.g., update context or state)
-  };
+  }
+
+  localStorage.setItem("cartItems", JSON.stringify(cartItems));
+};
+
 
   const toggleFavorite = () => {
     const favHotels: string[] = JSON.parse(
@@ -156,7 +183,7 @@ export default function FoodItemPage() {
           fill
           className="object-cover"
         />
-        <div className="absolute top-4 left-4 flex gap-2">
+        <div className="absolute bottom-14 left-4 flex gap-2">
           <button
             className="p-2 rounded-full bg-black/30 text-white hover:bg-black/50 transition-colors"
             onClick={() => router.back()}
@@ -186,14 +213,14 @@ export default function FoodItemPage() {
                   href={`/restaurants/${foodItem.hotelID}`}
                   className="text-sm text-primary-600 hover:underline dark:text-primary-400"
                 >
-                  {hotelName}
+                  {hotelName} 
                 </Link>
                 <span className="text-gray-500 dark:text-gray-400">•</span>
                 <div className="flex items-center">
                   <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                  <span className="ml-1 text-sm">{foodItem.rating || "N/A"}</span>
+                  <span className="ml-1 text-sm">{foodItem.rating || "4.5"}</span>
                   <span className="ml-1 text-xs text-gray-500 dark:text-gray-400">
-                    ({foodItem.reviewCount || 0})
+                    ({foodItem.reviewCount || 7})
                   </span>
                 </div>
               </div>
@@ -202,11 +229,11 @@ export default function FoodItemPage() {
               <div className="flex flex-wrap gap-4 mt-4 text-sm">
                 <div className="flex items-center">
                   <Info className="h-4 w-4 mr-1 text-primary-600 dark:text-primary-500" />
-                  <span>{foodItem.nutritionalInfo?.calories || "N/A"} cal</span>
+                  <span>{foodItem.nutritionalInfo?.calories || "10"} cal</span>
                 </div>
                 <div className="flex items-center">
                   <Clock className="h-4 w-4 mr-1 text-primary-600 dark:text-primary-500" />
-                  <span>{foodItem.prepTime || "N/A"}</span>
+                  <span>{foodItem.prepTime || "20 min"}</span>
                 </div>
               </div>
             </div>
@@ -240,10 +267,21 @@ export default function FoodItemPage() {
               <div className="flex gap-4">
                 <button
                   className="btn btn-outline flex-1"
-                  onClick={handleAddToCart}
+                  onClick={handleCartToggle}
                 >
-                  <ShoppingCart className="mr-2 h-4 w-4" />
-                  Add to Cart
+                    {
+                    cartAvailable ? (
+                      <span className="flex items-center">
+                        <ShoppingCart className="mr-2 h-4 w-4" />
+                        Add to Cart
+                      </span>
+                    ) : (
+                      <span className="flex items-center">
+                        <ShoppingCart className="mr-2 h-4 w-4" />
+                        Remove From Cart
+                      </span>
+                    )
+                  }
                 </button>
                 <button
                   className="btn btn-primary flex-1"
