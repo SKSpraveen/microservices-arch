@@ -294,16 +294,7 @@ app.get("/order/recommendations/:userId", async (req, res) => {
 });
 
 // Update Driver Location
-app.post("/order/update-driver-location", async (req, res) => {
-  try {
-    const { driverId, location } = req.body;
-    await Driver.updateOne({ driverId }, { currentLocation: location });
-    res.json({ message: "Driver location updated successfully" });
-  } catch (error) {
-    console.error("Error updating driver location:", error);
-    res.status(500).json({ error: "Failed to update driver location" });
-  }
-});
+
 
 // Track Order
 // app.get('/track-order/:orderId', async (req, res) => {

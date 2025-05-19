@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { FaMotorcycle, FaUser, FaClock, FaMapMarkerAlt, FaMoneyBillWave } from 'react-icons/fa';
 import ProfilePage from './profile';
@@ -8,10 +8,48 @@ import DriverHome from './DriverHome';
 import VehicleProfilePage from './vehicle'
 import DriverOrderHistoryPage from './driverOrderHistory'
 import { useRouter } from 'next/navigation';
+import axios from 'axios';
+
 
 export default function DriverDashboard() {
   const router = useRouter();
   const [activeSection, setActiveSection] = useState('dashboard');
+
+    useEffect(() => {
+    let intervalId;
+
+    
+    const updateLocation = () => {
+      const DRIVER_ID = JSON.parse(localStorage.getItem('userProfile') as string)._id;
+      if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords;
+
+            try {
+              await axios.post('http://localhost:3000/api/users/drivers/update-driver-location', {
+                driverId: DRIVER_ID,
+                location: { lat: latitude, lng: longitude },
+              });
+              console.log('Location updated:', latitude, longitude);
+            } catch (error) {
+              console.error('Failed to update location', error);
+            }
+          },
+          (error) => {
+            console.error('Geolocation error:', error);
+          }
+        );
+      } else {
+        console.error('Geolocation not available');
+      }
+    };
+
+    updateLocation(); // immediate
+    intervalId = setInterval(updateLocation, 3000);
+
+    return () => clearInterval(intervalId); // cleanup on unmount
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-background to-muted/50 dark:from-dark-900 dark:via-dark-900 dark:to-dark-800">

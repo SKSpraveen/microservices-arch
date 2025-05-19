@@ -6,13 +6,13 @@ import Footer from "@/components/footer";
 import axios from "axios";
 
 interface CartItem {
-    id: number;
-    name: string;
-    price: number;
-    quantity: number;
-    addedAt: string;
-    image: string;
-  }
+  id: number;
+  name: string;
+  price: number;
+  quantity: number;
+  addedAt: string;
+  image: string;
+}
 
 export default function SuccessPage() {
   const router = useRouter();
@@ -43,39 +43,51 @@ export default function SuccessPage() {
       // Check if the order was already saved, and if not, save it now
       const saveOrderIfNotExists = async () => {
         try {
-            if (!Array.isArray(selectedItems) || !Array.isArray(cartItems)) {
-                console.error("Invalid data format in localStorage.");
-                return;
-              }
-          
-              if (totalAmount <= 0) {
-                console.error("Total amount must be greater than zero.");
-                return;
-              }
-          
-              // Filter cart items based on selected items
-              const orderList: CartItem[] = cartItems.filter((item) =>
-                selectedItems.includes(item.id)
-              );
-          
-              if (orderList.length === 0) {
-                console.error("No items selected for the order.");
-                return;
-              }
-          
-              // Save the order to the backend
-              await axios.post("http://localhost:3000/order/save-order", {
-                paymentIntentId,
-                paymentIntentClientSecret,
-                totalAmount,
-                items: orderList,
-                status: "completed",
-                userId: JSON.parse(localStorage.getItem("userProfile") as string)._id,
-                createdAt: new Date().toISOString(),
-                delivaryLocation: localStorage.getItem("currentOrderAddress"),
-              });
+          if (!Array.isArray(selectedItems) || !Array.isArray(cartItems)) {
+            console.error("Invalid data format in localStorage.");
+            return;
+          }
+
+          if (totalAmount <= 0) {
+            console.error("Total amount must be greater than zero.");
+            return;
+          }
+
+          // Filter cart items based on selected items
+          const orderList: CartItem[] = cartItems.filter((item) =>
+            selectedItems.includes(item.id)
+          );
+
+          if (orderList.length === 0) {
+            console.error("No items selected for the order.");
+            return;
+          }
+
+          // Save the order to the backend
+          await axios.post("http://localhost:3000/order/save-order", {
+            paymentIntentId,
+            paymentIntentClientSecret,
+            totalAmount,
+            items: orderList,
+            status: "completed",
+            userId: JSON.parse(localStorage.getItem("userProfile") as string)
+              ._id,
+            createdAt: new Date().toISOString(),
+            delivaryLocation: localStorage.getItem("currentOrderAddress"),
+          });
         } catch (err) {
           console.error("Error saving order:", err);
+        } finally {
+          // Clear local storage after saving the order
+          localStorage.removeItem("currentOrderAddress");
+          // Remove selected items from cartItems
+          const updatedCart = cartItems.filter(
+            (item) => !selectedItems.includes(item.id)
+          );
+          localStorage.setItem("cartItems", JSON.stringify(updatedCart));
+
+          // Remove selectedItems from localStorage
+          localStorage.removeItem("selectedItems");
         }
       };
 
