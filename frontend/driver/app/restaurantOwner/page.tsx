@@ -29,47 +29,59 @@ export default function RestaurantDashboard() {
 	const [orders, setOrders] = useState<any[]>([]);
 	const [activeSection, setActiveSection] = useState("dashboard");
 
-	// Fetching hotels and orders when the component mounts
 	useEffect(() => {
-		const fetchHotels = async () => {
-			try {
-				// Fetch all restaurants (hotels) for the current user
-				let restaurantData: any = await fetchRestaurants();
-
-				// Filter the restaurants to include only those that belong to the current user
-				restaurantData = restaurantData.filter(
-					(restaurant: any) =>
-						restaurant.userID ===
-						JSON.parse(localStorage.getItem("userProfile")!).userId
-				);
-
-				// Set the fetched hotels data
-				setHotels(restaurantData);
-
-				// Fetch orders for each hotel
-				let allOrders = [];
-				for (const hotel of restaurantData) {
-					const ordersResponse = await axios.get(
-						`http://localhost:3000/orders/hotel/${hotel._id}`
-					);
-          const orders = ordersResponse.data;
-
-          if (Array.isArray(orders)) {
-            allOrders.push(...orders);
-          } else {
-            console.warn(`Unexpected response for hotel ${hotel._id}:`, orders);
+    const fetchHotelsAndOrders = async () => {
+      try {
+        // Step 1: Fetch all restaurants
+        let restaurantData: any = await fetchRestaurants();
+  
+        // Step 2: Get the current user's ID
+        const currentUser = JSON.parse(localStorage.getItem("userProfile")!);
+        const currentUserId = currentUser?.userID || currentUser?.userId;
+  
+        if (!currentUserId) {
+          console.error("User ID not found in localStorage.");
+          return;
+        }
+  
+        // Step 3: Filter restaurants that belong to the current user
+        restaurantData = restaurantData.filter(
+          (restaurant: any) => restaurant.userID === currentUserId
+        );
+  
+        // Step 4: Set the hotels state
+        setHotels(restaurantData);
+  
+        // Step 5: Fetch orders for each hotel, with error handling
+        const allOrders = [];
+  
+        for (const hotel of restaurantData) {
+          try {
+            const ordersResponse = await axios.get(
+              `http://localhost:3000/order/orders/hotel/${hotel._id}`
+            );
+            const orders = ordersResponse.data;
+  
+            if (Array.isArray(orders)) {
+              allOrders.push(...orders);
+            } else {
+              console.warn(`Unexpected order response for hotel ${hotel._id}:`, orders);
+            }
+          } catch (error) {
+            console.error(`Error fetching orders for hotel ${hotel._id}:`, error);
           }
-				}
-
-				// Set the orders for all hotels
-				setOrders(allOrders);
-			} catch (err) {
-				console.error("Error fetching data", err);
-			}
-		};
-
-		fetchHotels();
-	}, []);
+        }
+  
+        // Step 6: Set the orders state
+        setOrders(allOrders);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      }
+    };
+  
+    fetchHotelsAndOrders();
+  }, []);
+  
 
 	// Calculate active deliveries (for analytics)
 	const activeDeliveries = orders.filter(
