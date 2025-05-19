@@ -13,6 +13,7 @@ export default function Hotel() {
   const [showModal, setShowModal] = useState(false);
   const [editingHotelId, setEditingHotelId] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [addHotelClick, setAddHotelClick] = useState(false);
   const [newHotel, setNewHotel] = useState({
     userID: '',
     hotelName: '',
@@ -68,6 +69,7 @@ export default function Hotel() {
   }, [filters]);
 
   const handleAddOrUpdateHotel = async () => {
+    setAddHotelClick(!addHotelClick)
     const formErrors = validateForm();
     if (Object.keys(formErrors).length > 0) {
       setErrors(formErrors);
@@ -128,6 +130,8 @@ export default function Hotel() {
       setSelectedFile(null); // Clear file
     } catch (error) {
       console.error("Error handling add/update hotel:", error);
+    }finally {
+      setAddHotelClick(false)
     }
   };
 
@@ -329,8 +333,11 @@ export default function Hotel() {
               <button 
                 onClick={handleAddOrUpdateHotel}
                 className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded"
+                disabled={addHotelClick}
               >
-                {editingHotelId ? 'Update Hotel' : 'Save Hotel'}
+                {
+                  addHotelClick ? "working..." : (editingHotelId ? "Update Hotel" : "Add Hotel")
+                }
               </button>
             </div>
           </div>
