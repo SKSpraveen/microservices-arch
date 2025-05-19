@@ -34,15 +34,6 @@ const FoodSchema = new mongoose.Schema(
         ],
       },
     ],
-    relatedItems: [
-      {
-        id: { type: String, required: true },
-        name: { type: String, required: true },
-        description: { type: String, default: "" },
-        price: { type: Number, default: 0 },
-        image: { type: String, default: "default_banner_image_url" },
-      },
-    ],
     rating: { type: Number },
   },
   

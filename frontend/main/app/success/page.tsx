@@ -64,13 +64,13 @@ export default function SuccessPage() {
               }
           
               // Save the order to the backend
-              await axios.post("/api/save-order", {
+              await axios.post("http://localhost:3000/order/save-order", {
                 paymentIntentId,
                 paymentIntentClientSecret,
                 totalAmount,
                 items: orderList,
                 status: "completed",
-                userId: localStorage.getItem("userId"),
+                userId: JSON.parse(localStorage.getItem("userProfile") as string)._id,
                 createdAt: new Date().toISOString(),
                 delivaryLocation: localStorage.getItem("currentOrderAddress"),
               });
@@ -91,7 +91,7 @@ export default function SuccessPage() {
   return (
     <>
       <Navbar />
-      <main className="flex flex-col justify-center items-center min-h-[70vh] px-4 animate-fade-in">
+      <main className="flex flex-col justify-center items-center bg-gray-50 dark:bg-gray-800 min-h-[70vh] px-4 animate-fade-in">
         <div className="card max-w-md w-full text-center py-10 px-6 animate-slide-up">
           <div className="text-green-600 dark:text-green-400 text-4xl font-bold mb-4">
             🎉 Payment Successful!
