@@ -47,7 +47,7 @@ export default function OrdersPage() {
               <p>Order ID: {order._id}</p>
               <p>Status: {order.status}</p>
               <div className="flex gap-2 mt-2">
-                <Link href={`/orders/tracking/${order._id}`} className="text-blue-600 underline">
+                <Link href={`orders/tracking/${order._id}`} className="text-blue-600 underline">
                   Track Order
                 </Link>
                 {order.status === "pending" && (
