@@ -6,21 +6,27 @@ import axios from "axios"
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState([])
-  const userProfile = JSON.parse(localStorage.getItem("userProfile") || "{}")
-
+  const [userProfile, setUserProfile] = useState<any>(null)
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const res = await axios.get(`http://localhost:3000/order/orders/user/${userProfile._id}`)
-        setOrders(res.data)
-      } catch (err) {
-        console.error("Failed to load orders:", err)
-      }
-    }
+    // ✅ Safe localStorage access
+    const storedProfile = localStorage.getItem("userProfile")
+    if (storedProfile) {
+      const parsedProfile = JSON.parse(storedProfile)
+      setUserProfile(parsedProfile)
 
-    fetchOrders()
+      // Fetch orders only after setting profile
+      fetchOrders(parsedProfile._id)
+    }
   }, [])
 
+  const fetchOrders = async (userId: string) => {
+    try {
+      const res = await axios.get(`http://localhost:3000/order/orders/user/${userId}`)
+      setOrders(res.data)
+    } catch (err) {
+      console.error("Failed to load orders:", err)
+    }
+  }
   const handleCancelOrder = async (orderId: any) => {
     try {
       await axios.post(`http://localhost:3000/order/orders/${orderId}/cancel`)
