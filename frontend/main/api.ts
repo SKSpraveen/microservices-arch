@@ -314,6 +314,9 @@ export const fetchRestaurantReviews = async (restaurantId: string) => {
 
 export const createRestaurantReviews = async (data: any) => {
   try {
+    const userProfile = JSON.parse(localStorage.getItem("userProfile") as string);
+    const username = userProfile.username;
+    data["username"] = username;
     const response = await reviewAPI.post(`/`, data);
     return response.data;
   } catch (error) {

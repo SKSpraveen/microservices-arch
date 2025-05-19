@@ -4,12 +4,13 @@ const errorHandler = require("../utils/error");
 // Create a new review
 const createReview = async (req, res, next) => {
   try {
-    const { userId, refId, type, count, comment } = req.body;
+    const { userId, refId, type, count, comment, username } = req.body;
 
     // Validate required fields
     if (!userId || !refId || !type || !count || !comment) {
       return next(errorHandler(400, "All fields are required"));
     }
+
 
     // Validate `type` enum values
     const validTypes = ["driver", "hotel", "food", "system"];
@@ -23,9 +24,11 @@ const createReview = async (req, res, next) => {
       type,
       count,
       comment,
+      username
     });
 
     const savedReview = await newReview.save();
+    // const res = axios.put("http://localhost:3000/api/hotel/"+ refId, {})
     res.status(201).json(savedReview);
   } catch (error) {
     next(error);
