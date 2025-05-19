@@ -1,86 +1,88 @@
 "use client"
-
 import type React from "react"
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import { CreditCard, Plus, Edit, Trash2, Check, X, AlertCircle } from "lucide-react"
 
-// Sample payment methods data
-const initialPaymentMethods = [
-  {
-    id: 1,
-    type: "visa",
-    cardNumber: "•••• •••• •••• 4242",
-    expiryMonth: "04",
-    expiryYear: "2025",
-    cardholderName: "John Doe",
-    isDefault: true,
-  },
-  {
-    id: 2,
-    type: "mastercard",
-    cardNumber: "•••• •••• •••• 5678",
-    expiryMonth: "09",
-    expiryYear: "2024",
-    cardholderName: "John Doe",
-    isDefault: false,
-  },
-]
-
 // Card type logos
-const cardLogos : any= {
+const cardLogos: Record<string, string> = {
   visa: "/placeholder.svg?height=30&width=50",
   mastercard: "/placeholder.svg?height=30&width=50",
   amex: "/placeholder.svg?height=30&width=50",
   discover: "/placeholder.svg?height=30&width=50",
 }
 
+interface PaymentMethod {
+  id: number
+  type: string
+  cardNumber: string
+  lastFourDigits: string
+  expiryMonth: string
+  expiryYear: string
+  cardholderName: string
+  isDefault: boolean
+  cvv: string
+}
+
 export default function PaymentMethodsPage() {
-  const [paymentMethods, setPaymentMethods] = useState(initialPaymentMethods)
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([])
   const [showPaymentForm, setShowPaymentForm] = useState(false)
   const [editingPaymentId, setEditingPaymentId] = useState<number | null>(null)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(null)
-
-  const emptyPaymentMethod = {
-    id: 0,
+  const [formData, setFormData] = useState<Omit<PaymentMethod, "id" | "lastFourDigits">>({
     type: "",
     cardNumber: "",
     expiryMonth: "",
     expiryYear: "",
     cardholderName: "",
-    cvv: "",
     isDefault: false,
-  }
-
-  const [formData, setFormData] = useState(emptyPaymentMethod)
+    cvv: "",
+  })
   const [formErrors, setFormErrors] = useState<Record<string, string>>({})
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    const savedPayments = localStorage.getItem("paymentMethods")
+    const defaultPaymentId = localStorage.getItem("defaultPaymentId")
+
+    if (savedPayments) {
+      const parsed = JSON.parse(savedPayments)
+      const updated = parsed.map((p: any) => ({
+        ...p,
+        isDefault: Number(defaultPaymentId) === p.id,
+      }))
+      setPaymentMethods(updated)
+    }
+  }, [])
+
+  // Save to localStorage whenever paymentMethods change
+  useEffect(() => {
+    if (paymentMethods.length > 0) {
+      localStorage.setItem("paymentMethods", JSON.stringify(paymentMethods))
+      const defaultPayment = paymentMethods.find((p) => p.isDefault)
+      if (defaultPayment) {
+        localStorage.setItem("defaultPaymentId", String(defaultPayment.id))
+      }
+    } else {
+      localStorage.removeItem("paymentMethods")
+      localStorage.removeItem("defaultPaymentId")
+    }
+  }, [paymentMethods])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
 
-    // Format card number with spaces
     if (name === "cardNumber") {
-      const formattedValue = value
-        .replace(/\s/g, "")
-        .replace(/(.{4})/g, "$1 ")
-        .trim()
-        .slice(0, 19)
-
+      const formattedValue = value.replace(/\s/g, "").replace(/(.{4})/g, "$1 ").trim()
       setFormData((prev) => ({
         ...prev,
         [name]: formattedValue,
-        // Auto-detect card type based on first digit
         type: detectCardType(value.replace(/\s/g, "")),
       }))
     } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }))
+      setFormData((prev) => ({ ...prev, [name]: value }))
     }
 
-    // Clear error when field is edited
     if (formErrors[name]) {
       setFormErrors((prev) => {
         const newErrors = { ...prev }
@@ -90,39 +92,44 @@ export default function PaymentMethodsPage() {
     }
   }
 
-  const detectCardType = (cardNumber: string) => {
+  const detectCardType = (cardNumber: string): string => {
     const firstDigit = cardNumber.charAt(0)
     const firstTwoDigits = cardNumber.substring(0, 2)
-
     if (firstDigit === "4") return "visa"
     if (firstTwoDigits >= "51" && firstTwoDigits <= "55") return "mastercard"
     if (firstDigit === "3" && (cardNumber.charAt(1) === "4" || cardNumber.charAt(1) === "7")) return "amex"
     if (firstDigit === "6") return "discover"
-
     return ""
   }
 
   const handleDefaultChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({
-      ...prev,
-      isDefault: e.target.checked,
-    }))
+    setFormData((prev) => ({ ...prev, isDefault: e.target.checked }))
   }
 
   const handleAddPayment = () => {
-    setFormData(emptyPaymentMethod)
+    setFormData({
+      type: "",
+      cardNumber: "",
+      lastFourDigits: "",
+      expiryMonth: "",
+      expiryYear: "",
+      cardholderName: "",
+      isDefault: false,
+    })
     setFormErrors({})
     setShowPaymentForm(true)
     setEditingPaymentId(null)
   }
 
-  const handleEditPayment = (payment: (typeof initialPaymentMethods)[0]) => {
-    // In a real app, you would fetch the full payment details
-    // For demo purposes, we'll just use what we have
+  const handleEditPayment = (payment: PaymentMethod) => {
     setFormData({
-      ...payment,
-      cardNumber: "", // For security, don't pre-fill card number
-      cvv: "", // For security, don't pre-fill CVV
+      type: payment.type,
+      cardNumber: payment.cardNumber, // For security reasons
+      expiryMonth: payment.expiryMonth,
+      expiryYear: payment.expiryYear,
+      cardholderName: payment.cardholderName,
+      isDefault: payment.isDefault,
+      cvv: payment.cvv,
     })
     setFormErrors({})
     setShowPaymentForm(true)
@@ -136,7 +143,6 @@ export default function PaymentMethodsPage() {
   const confirmDeletePayment = () => {
     if (!showDeleteConfirm) return
 
-    // Don't allow deleting the default payment method
     const paymentToDelete = paymentMethods.find((p) => p.id === showDeleteConfirm)
     if (paymentToDelete?.isDefault) {
       alert("Cannot delete default payment method. Please set another payment method as default first.")
@@ -144,47 +150,34 @@ export default function PaymentMethodsPage() {
       return
     }
 
-    setPaymentMethods((prev) => prev.filter((p) => p.id !== showDeleteConfirm))
+    const updatedList = paymentMethods.filter((p) => p.id !== showDeleteConfirm)
+    setPaymentMethods(updatedList)
     setShowDeleteConfirm(null)
     alert("Payment method deleted successfully")
   }
 
   const handleSetDefault = (paymentId: number) => {
-    setPaymentMethods((prev) =>
-      prev.map((payment) => ({
-        ...payment,
-        isDefault: payment.id === paymentId,
-      })),
-    )
+    const updated = paymentMethods.map((p) => ({
+      ...p,
+      isDefault: p.id === paymentId,
+    }))
+    setPaymentMethods(updated)
     alert("Default payment method updated successfully")
   }
 
   const validateForm = () => {
     const errors: Record<string, string> = {}
+    const cardNumCleaned = formData.cardNumber.replace(/\s/g, "")
 
-    if (!formData.cardNumber.trim()) {
+    if (!cardNumCleaned) {
       errors.cardNumber = "Card number is required"
-    } else if (formData.cardNumber.replace(/\s/g, "").length < 15) {
+    } else if (cardNumCleaned.length < 15) {
       errors.cardNumber = "Please enter a valid card number"
     }
 
-    if (!formData.expiryMonth) {
-      errors.expiryMonth = "Expiry month is required"
-    }
-
-    if (!formData.expiryYear) {
-      errors.expiryYear = "Expiry year is required"
-    }
-
-    if (!formData.cardholderName.trim()) {
-      errors.cardholderName = "Cardholder name is required"
-    }
-
-    if (!formData.cvv?.trim()) {
-      errors.cvv = "CVV is required"
-    } else if (formData.cvv.length < 3) {
-      errors.cvv = "CVV must be at least 3 digits"
-    }
+    if (!formData.expiryMonth) errors.expiryMonth = "Expiry month is required"
+    if (!formData.expiryYear) errors.expiryYear = "Expiry year is required"
+    if (!formData.cardholderName.trim()) errors.cardholderName = "Cardholder name is required"
 
     setFormErrors(errors)
     return Object.keys(errors).length === 0
@@ -193,60 +186,52 @@ export default function PaymentMethodsPage() {
   const handleSavePayment = () => {
     if (!validateForm()) return
 
+    const lastFour = formData.cardNumber.slice(-4)
+    const maskedCardNumber = `•••• •••• •••• ${lastFour}`
+
     if (editingPaymentId) {
-      // Update existing payment method
-      setPaymentMethods((prev) => {
-        // If this is set as default, update other payment methods
-        if (formData.isDefault) {
-          return prev.map((payment) =>
-            payment.id === editingPaymentId
-              ? {
-                  ...payment,
-                  expiryMonth: formData.expiryMonth,
-                  expiryYear: formData.expiryYear,
-                  cardholderName: formData.cardholderName,
-                  isDefault: true,
-                }
-              : { ...payment, isDefault: false },
-          )
-        }
-
-        return prev.map((payment) =>
-          payment.id === editingPaymentId
-            ? {
-                ...payment,
-                expiryMonth: formData.expiryMonth,
-                expiryYear: formData.expiryYear,
-                cardholderName: formData.cardholderName,
-                isDefault: formData.isDefault,
-              }
-            : payment,
-        )
-      })
-
+      const updated = paymentMethods.map((p) =>
+        p.id === editingPaymentId
+          ? {
+              ...p,
+              type: formData.type,
+              expiryMonth: formData.expiryMonth,
+              expiryYear: formData.expiryYear,
+              cardholderName: formData.cardholderName,
+              isDefault: formData.isDefault,
+            }
+          : formData.isDefault
+          ? { ...p, isDefault: false }
+          : p
+      )
+      setPaymentMethods(updated)
       alert("Payment method updated successfully")
     } else {
-      // Add new payment method
       const newPayment = {
-        ...formData,
-        id: Date.now(), // Generate a unique ID
-        cardNumber: "•••• •••• •••• " + formData.cardNumber.slice(-4), // Mask the card number
+        id: Date.now(),
+        type: formData.type,
+        cardNumber: maskedCardNumber,
+        realCardNumber: formData.cardNumber,
+        lastFourDigits: lastFour,
+        expiryMonth: formData.expiryMonth,
+        expiryYear: formData.expiryYear,
+        cardholderName: formData.cardholderName,
+        isDefault: formData.isDefault,
+        cvv: formData.cvv,
       }
 
-      setPaymentMethods((prev) => {
-        // If this is set as default or it's the first payment method, update other payment methods
-        if (newPayment.isDefault || prev.length === 0) {
-          return [...prev.map((p) => ({ ...p, isDefault: false })), { ...newPayment, isDefault: true }]
-        }
-        return [...prev, newPayment]
-      })
+      let updated = [...paymentMethods, newPayment]
 
+      if (newPayment.isDefault || paymentMethods.length === 0) {
+        updated = updated.map((p) => ({ ...p, isDefault: p.id === newPayment.id }))
+      }
+
+      setPaymentMethods(updated)
       alert("Payment method added successfully")
     }
 
     setShowPaymentForm(false)
     setEditingPaymentId(null)
-    setFormData(emptyPaymentMethod)
   }
 
   return (
@@ -265,6 +250,7 @@ export default function PaymentMethodsPage() {
         </button>
       </div>
 
+      {/* Payment List */}
       {paymentMethods.length > 0 ? (
         <div className="space-y-4">
           {paymentMethods.map((payment) => (
@@ -288,7 +274,9 @@ export default function PaymentMethodsPage() {
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="font-medium dark:text-white">{payment.type.charAt(0).toUpperCase() + payment.type.slice(1)}</h3>
+                        <h3 className="font-medium dark:text-white">
+                          {payment.type.charAt(0).toUpperCase() + payment.type.slice(1)}
+                        </h3>
                         {payment.isDefault && (
                           <span className="px-2 py-0.5 text-xs bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-300 rounded-full">
                             Default
@@ -302,7 +290,6 @@ export default function PaymentMethodsPage() {
                       <p className="text-sm mt-1 dark:text-white">{payment.cardholderName}</p>
                     </div>
                   </div>
-
                   <div className="flex items-center gap-2 md:self-start">
                     <button
                       onClick={() => handleEditPayment(payment)}
@@ -310,7 +297,6 @@ export default function PaymentMethodsPage() {
                     >
                       <Edit className="w-4 h-4" />
                     </button>
-
                     <button
                       onClick={() => handleDeletePayment(payment.id)}
                       className="p-2 rounded-full text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
@@ -318,7 +304,6 @@ export default function PaymentMethodsPage() {
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
-
                     {!payment.isDefault && (
                       <button
                         onClick={() => handleSetDefault(payment.id)}
@@ -354,6 +339,7 @@ export default function PaymentMethodsPage() {
         </div>
       )}
 
+      {/* Security Info */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
         <div className="p-6">
           <div className="flex items-start gap-3">
@@ -369,9 +355,9 @@ export default function PaymentMethodsPage() {
         </div>
       </div>
 
-      {/* Add/Edit Payment Method Modal */}
+      {/* Modal: Add/Edit Payment Method */}
       {showPaymentForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-[#000000a2] bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
@@ -385,7 +371,6 @@ export default function PaymentMethodsPage() {
                   <X className="w-5 h-5" />
                 </button>
               </div>
-
               <div className="space-y-4">
                 <div className="space-y-2">
                   <label htmlFor="cardNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -398,14 +383,15 @@ export default function PaymentMethodsPage() {
                     placeholder="1234 5678 9012 3456"
                     value={formData.cardNumber}
                     onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border ${formErrors.cardNumber ? "border-red-500" : "border-gray-300 dark:border-gray-600"} rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white`}
+                    className={`w-full px-3 py-2 border ${
+                      formErrors.cardNumber ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+                    } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white`}
                     disabled={editingPaymentId !== null}
                   />
                   {formErrors.cardNumber && (
                     <p className="text-sm text-red-600 dark:text-red-400 mt-1">{formErrors.cardNumber}</p>
                   )}
                 </div>
-
                 <div className="grid grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <label htmlFor="expiryMonth" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -416,7 +402,9 @@ export default function PaymentMethodsPage() {
                       name="expiryMonth"
                       value={formData.expiryMonth}
                       onChange={handleInputChange}
-                      className={`w-full px-3 py-2 border ${formErrors.expiryMonth ? "border-red-500" : "border-gray-300 dark:border-gray-600"} rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white`}
+                      className={`w-full px-3 py-2 border ${
+                        formErrors.expiryMonth ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+                      } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white`}
                     >
                       <option value="">MM</option>
                       {Array.from({ length: 12 }, (_, i) => {
@@ -432,7 +420,6 @@ export default function PaymentMethodsPage() {
                       <p className="text-sm text-red-600 dark:text-red-400 mt-1">{formErrors.expiryMonth}</p>
                     )}
                   </div>
-
                   <div className="space-y-2">
                     <label htmlFor="expiryYear" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                       Expiry Year*
@@ -442,7 +429,9 @@ export default function PaymentMethodsPage() {
                       name="expiryYear"
                       value={formData.expiryYear}
                       onChange={handleInputChange}
-                      className={`w-full px-3 py-2 border ${formErrors.expiryYear ? "border-red-500" : "border-gray-300 dark:border-gray-600"} rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white`}
+                      className={`w-full px-3 py-2 border ${
+                        formErrors.expiryYear ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+                      } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white`}
                     >
                       <option value="">YY</option>
                       {Array.from({ length: 10 }, (_, i) => {
@@ -458,7 +447,6 @@ export default function PaymentMethodsPage() {
                       <p className="text-sm text-red-600 dark:text-red-400 mt-1">{formErrors.expiryYear}</p>
                     )}
                   </div>
-
                   <div className="space-y-2">
                     <label htmlFor="cvv" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                       CVV*
@@ -470,13 +458,14 @@ export default function PaymentMethodsPage() {
                       placeholder="123"
                       value={formData.cvv}
                       onChange={handleInputChange}
-                      className={`w-full px-3 py-2 border ${formErrors.cvv ? "border-red-500" : "border-gray-300 dark:border-gray-600"} rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white`}
+                      className={`w-full px-3 py-2 border ${
+                        formErrors.cvv ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+                      } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white`}
                       maxLength={4}
                     />
                     {formErrors.cvv && <p className="text-sm text-red-600 dark:text-red-400 mt-1">{formErrors.cvv}</p>}
                   </div>
                 </div>
-
                 <div className="space-y-2">
                   <label
                     htmlFor="cardholderName"
@@ -491,13 +480,14 @@ export default function PaymentMethodsPage() {
                     placeholder="Name as it appears on card"
                     value={formData.cardholderName}
                     onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border ${formErrors.cardholderName ? "border-red-500" : "border-gray-300 dark:border-gray-600"} rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white`}
+                    className={`w-full px-3 py-2 border ${
+                      formErrors.cardholderName ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+                    } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white`}
                   />
                   {formErrors.cardholderName && (
                     <p className="text-sm text-red-600 dark:text-red-400 mt-1">{formErrors.cardholderName}</p>
                   )}
                 </div>
-
                 <div className="flex items-center space-x-2 pt-2">
                   <input
                     type="checkbox"
@@ -512,7 +502,7 @@ export default function PaymentMethodsPage() {
                 </div>
               </div>
             </div>
-            <div className="px-6 py-4 bg-gray-50 dark:bg-gray-750 flex justify-end gap-2">
+            <div className="px-6 py-4 bg-gray-50 dark:bg-gray-700 flex justify-end gap-2">
               <button
                 onClick={() => setShowPaymentForm(false)}
                 className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors"
@@ -533,7 +523,7 @@ export default function PaymentMethodsPage() {
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-[#000000be] bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full">
             <div className="p-6">
               <h3 className="text-lg font-medium mb-4">Delete Payment Method</h3>
