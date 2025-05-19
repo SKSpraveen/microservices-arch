@@ -346,10 +346,11 @@ app.get('/orders/driver/:driverId', async (req, res) => {
 });
 
 app.get('/orders/hotel/:hotelId', async (req, res) => {
+  console.log("helllo")
   try {
     const { hotelId } = req.params;
     const orders = await Order.find({ hotelId });
-    if (!orders.length) return res.status(404).json({ error: 'No orders found for this hotel' });
+    if (!orders.length) return res.status(200).json({ error: 'No orders found for this hotel' });
     res.json(orders);
   } catch (error) {
     console.error('Error fetching orders by hotel ID:', error);
