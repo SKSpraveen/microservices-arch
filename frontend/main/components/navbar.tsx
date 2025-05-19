@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect,useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getToken, setToken } from "@/store";
@@ -10,8 +10,30 @@ import { refreshToken } from "@/api";
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const hideTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const storedLogin = localStorage.getItem("isLoggedIn") === "true";
+    setIsLoggedIn(storedLogin);
+  }, []);
+
+  const handleMouseEnter = () => {
+    // Clear any existing hide timeout and open immediately
+    if (hideTimeout.current) {
+      clearTimeout(hideTimeout.current);
+    }
+    setMenuOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    // Set timeout to close the menu after 2 seconds
+    hideTimeout.current = setTimeout(() => {
+      setMenuOpen(false);
+    }, 500);
+  };
 
   // useEffect(() => {
   //   const refreshInterval = setInterval(async () => {
@@ -27,7 +49,6 @@ export default function Navbar() {
   useEffect(() => {
     const checkUserAuth = async () => {
       const isAuthenticated = await checkAuth();
-      setIsLoggedIn(isAuthenticated);
     };
 
     checkUserAuth();
@@ -50,14 +71,13 @@ export default function Navbar() {
 
   const handleLogout = () => {
     localStorage.setItem("isLoggedIn", "false");
-    setIsLoggedIn(false);
+    router.push("/signin");
   };
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "nav-blur py-2" : "bg-transparent py-4"
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "nav-blur py-2" : "bg-transparent py-4"
+        }`}
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between">
@@ -133,7 +153,10 @@ export default function Navbar() {
                     3
                   </span>
                 </Link>
-                <div className="relative group">
+                <div className="relative group" 
+                  onMouseEnter={handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}>
+                  {/* Trigger Button */}
                   <button className="flex items-center space-x-2">
                     <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-medium">
                       JD
@@ -151,7 +174,10 @@ export default function Navbar() {
                       />
                     </svg>
                   </button>
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-10 hidden group-hover:block dark:bg-dark-800">
+                  
+                  {menuOpen && (
+                    /* Dropdown Menu */
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-10 group-hover:block dark:bg-dark-800">
                     <Link
                       href="/profile"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-dark-700"
@@ -189,6 +215,7 @@ export default function Navbar() {
                       Sign out
                     </button>
                   </div>
+                  )}
                 </div>
               </>
             ) : (

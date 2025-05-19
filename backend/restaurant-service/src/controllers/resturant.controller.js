@@ -24,7 +24,7 @@ exports.createHotel = async (req, res) => {
     }
     
     const newHotel = new Hotel({
-      userID,
+      userID: userID,
       hotelName,
       hotelAddress,
       metaData,
@@ -39,7 +39,7 @@ exports.createHotel = async (req, res) => {
       cousinProvided: cousinProvided || [],
       isFeatured: isFeatured || false,
     });
-
+    console.log(newHotel)
     await newHotel.save();
     res.status(201).json(newHotel);
   } catch (error) {

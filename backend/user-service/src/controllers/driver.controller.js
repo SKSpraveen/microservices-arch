@@ -5,6 +5,7 @@ import {
   getDriverById,
   updateDriver,
   deleteDriver,
+  updateAuthCertificatesByEmail,
 } from '../services/driver.service.js';
 
 
@@ -50,4 +51,23 @@ export const deleteDriverController = async (req, res) => {
   result.success 
     ? res.status(204).send()
     : res.status(500).json({ error: result.error });
+};
+
+export const updateAuthCertificatesByEmailController = async (req, res) => {
+  const { email } = req.params;
+  const { insuranceImage, licenseImage, licensePlateNumber,vehicleType,vehicleImage } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ success: false, error: "Email is required" });
+  }
+
+  const certificatesData = { insuranceImage, licenseImage, licensePlateNumber,vehicleType,vehicleImage };
+
+  const result = await updateAuthCertificatesByEmail(email, certificatesData);
+
+  if (result.success) {
+    return res.status(200).json({ success: true, data: result.data });
+  } else {
+    return res.status(404).json({ success: false, error: result.error });
+  }
 };

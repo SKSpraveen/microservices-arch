@@ -14,6 +14,7 @@ export default function Hotel() {
   const [editingHotelId, setEditingHotelId] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [newHotel, setNewHotel] = useState({
+    userID: '',
     hotelName: '',
     hotelAddress: '',
     location: '',
@@ -53,9 +54,11 @@ export default function Hotel() {
 };
 
   useEffect(() => {
+    
     const fetchData = async () => {
       try {
-        const data = await fetchRestaurants(filters);
+        let data = await fetchRestaurants(filters);
+       data = data.filter(d => d.userID === JSON.parse(localStorage.getItem("userProfile")).userId)
         setHotels(data);
       } catch (err) {
         console.error("Error fetching restaurants", err);
@@ -79,9 +82,11 @@ export default function Hotel() {
       const res = await axios.post('https://api.cloudinary.com/v1_1/dxhzkog1c/image/upload', formData);
       bannerUrl = res.data.secure_url;
     }
-
+    const userID = JSON.parse(localStorage.getItem("userProfile")).userId
+  
     const hotelData = {
       id: editingHotelId, // Use timestamp for new ones
+      userID: userID,
       ...newHotel,
       rating: parseFloat(newHotel.rating),
       categoriesprovider: newHotel.categoriesprovider.split(',').map(item => item.trim()),
@@ -101,6 +106,7 @@ export default function Hotel() {
 
       } else {
         // Create new
+        alert(hotelData.userID)
         const newRestaurant = await createRestaurant(hotelData);
         setHotels(prevHotels => [...prevHotels, newRestaurant]);
       }

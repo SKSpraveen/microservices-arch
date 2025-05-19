@@ -112,9 +112,9 @@ export const login = async (emailOrUsername, password, req) => {
     });
     console.log(1);
     
-    if (existingSession && existingSession.expiresIn > Date.now()) {
-      return { success: true, message: 'Session already active on this device' };
-    }
+    // if (existingSession && existingSession.expiresIn > Date.now()) {
+    //   return { success: true, message: 'Session already active on this device' };
+    // }
     console.log(1);
     const token = await generateToken({ userId: user._id });
     

@@ -6,10 +6,10 @@ import { getCurrentUserRole } from "./config";
 const IS_DEV = process.env.NODE_ENV === "development";
 
 const SERVICE_PORTS = {
-  auth: 3001,
-  users: 3002,
-  hotel: 3003,
-  review: 3004,
+  auth: 3000,
+  users: 3000,
+  hotel: 3000,
+  review: 3000,
 } as const;
 
 type Service = keyof typeof SERVICE_PORTS;
@@ -343,11 +343,7 @@ export const updateHotel = async (updatedData: any): Promise<any> => {
 export const deleteHotel = async (id: string): Promise<void> => {
   try {
     const response = await restaurantAPI.delete(`/${id}`); 
-    if (response.status === 204) {
-      window.location.href = "/"; 
-    } else {
-      throw new Error(response.data.message || "Failed to delete restaurant.");
-    }
+    
   } catch (error: any) {
     console.error("Delete restaurant Failed:", error);
     throw error;
@@ -437,6 +433,18 @@ export const getDriverProfileById = async (email: string): Promise<any> => {
     throw error;
   }
 };
+export const addVehicleForDriver = async (email:string ,data: any):Promise<any> =>{
+  try {
+    const response = await userAPI.put(`/drivers/addVehicle/${email}`,data); 
+    if (response.status === 200) {
+      return response.data; 
+    }
+    throw new Error(response.data.message || "Failed to fetch user profile.");
+  } catch (error: any) {
+    console.error("Get User Profile Failed:", error);
+    throw error;
+  }
+}
 
 export async function getReviewsByFoodId(foodId: string) { /* backend fetch */ }
 export async function fetchRelatedItems(foodId: string) { /* backend fetch */ }

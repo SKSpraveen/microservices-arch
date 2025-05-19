@@ -67,7 +67,7 @@ import {
   export const loginController = async (req, res) => {
     try {
       const { emailOrUsername, password } = req.body;
-      const { success, token, role, session, message,email } = await login(emailOrUsername, password, req);
+      const { success, token, role, session, message,email, userId } = await login(emailOrUsername, password, req);
   
       if (message === 'Session already active on this device') {
         return res.status(200).json({ message });
@@ -83,7 +83,7 @@ import {
         maxAge: 24 * 60 * 60 * 1000,
       });
   
-      return res.status(200).json({ success: true, token, role, session ,email});
+      return res.status(200).json({ success: true, token, role, session ,email,  userId});
     } catch (error) {
       console.error(error);
       return res.status(error.statusCode || 500).json({ success: false, message: error.message });
