@@ -97,6 +97,7 @@ export default function LoginPage() {
 
       // Save token in local storage
       localStorage.setItem("authToken", response.data.token);
+      localStorage.setItem("userProfile", JSON.stringify(response.data.user));
       console.log('====================================');
       console.log("Login successful:", response.data);
       console.log('====================================');

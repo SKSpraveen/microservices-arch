@@ -18,7 +18,7 @@ export default function Navbar() {
   useEffect(() => {
     const authentication = localStorage.getItem("authToken");
     if( !authentication) {
-      router.push("/signin");
+      router.push("/");
     }
     else {
       setIsLoggedIn(true);
@@ -160,7 +160,9 @@ export default function Navbar() {
                     />
                   </svg>
                   <span className="absolute -top-1 -right-1 bg-secondary-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    3
+                    {
+                      JSON.parse(localStorage.getItem("cartItems") || "[]").length
+                    }
                   </span>
                 </Link>
                 <div className="relative group" 

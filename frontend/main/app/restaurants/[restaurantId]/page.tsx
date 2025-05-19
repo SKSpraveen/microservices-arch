@@ -31,7 +31,9 @@ export default function RestaurantMenuPage() {
 
   const handleAddReview = async () => {
     if (!newReview.trim()) return;
-    const profile = await getUserProfile();
+    const profile: any = JSON.parse(
+      localStorage.getItem("userProfile") as string
+    );
     // Validate inputs
     const userId = profile._id;
     const refId = params.restaurantId;
@@ -80,9 +82,21 @@ export default function RestaurantMenuPage() {
         setRestaurant(restaurantData);
 
         // Fetch reviews
-        // const reviewsData = await fetchRestaurantReviews(
-        //   params.restaurantId as string
-        // );
+        const reviewsData = await fetchRestaurantReviews(
+          params.restaurantId as string
+        );
+
+        console.log(reviewsData);
+        
+
+        setRating(() => {
+          let rating = 0;
+          for (let i = 0; i < reviewsData.length; i++) {
+            const review = reviewsData[i];
+            rating += review.count;
+          }
+          return rating;
+        });
 
         // // Filter reviews that have a userId
         // const reviewsWithUserId = reviewsData.filter(
@@ -109,7 +123,7 @@ export default function RestaurantMenuPage() {
         //   }
         // );
 
-        // setReviews(enrichedReviews);
+        setReviews(reviewsData);
 
         // Calculate distance and delivery time
         calculateDistanceAndTime(restaurantData.hotelAddress);
@@ -119,7 +133,7 @@ export default function RestaurantMenuPage() {
           params.restaurantId as string
         );
 
-        console.log("fuck you : "+menuData.data);
+        console.log("fuck you : " + menuData.data);
 
         // Step 2: For each menu item, fetch its flash deal
         const enrichedMenu: any[] = [];
@@ -157,7 +171,7 @@ export default function RestaurantMenuPage() {
         setMenuItems(enrichedMenu);
         // setFlashDeals(flashDealItems); // Only items with deals
 
-         console.log( enrichedMenu)
+        console.log(enrichedMenu);
         // console.log(flashDealItems)
 
         // Check if the restaurant is already in favorites
@@ -304,7 +318,7 @@ export default function RestaurantMenuPage() {
   if (!restaurant) return <p>Restaurant not found.</p>;
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col  bg-gray-100">
       <Navbar />
 
       {/* Restaurant Header */}
@@ -343,7 +357,7 @@ export default function RestaurantMenuPage() {
           <p>Open {restaurant.opentime}</p>
           <h1 className="text-3xl font-bold">{restaurant.hotelName}</h1>
           <div className="flex items-center gap-2 mt-2">
-            <span>{restaurant.rating}</span>
+            <span>{rating }⭐</span>
             <span>({reviews.length} reviews)</span>
             {distance && <span>{distance}</span>}
             {deliveryTime && <span>({deliveryTime})</span>}
@@ -384,122 +398,134 @@ export default function RestaurantMenuPage() {
 
           {/* Tab Content */}
           {activeTab === "Menu" && (
-  <div className="space-y-6">
-    {/* Search Bar */}
-    <div className="relative">
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-      <input
-        type="text"
-        placeholder="Search menu items..."
-        className="input pl-10 rounded-full"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-      />
-    </div>
+            <div className="space-y-6">
+              {/* Search Bar */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                <input
+                  type="text"
+                  placeholder="Search menu items..."
+                  className="input pl-10 rounded-full"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
 
-    {/* Menu Items */}
-    <div className="space-y-8">
-      {menuItems
-        .filter((item) =>
-          item.foodName.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-        .map((item) => (
-          <div
-            key={item._id}
-            className="group border rounded-xl p-4 bg-white dark:bg-dark-800 shadow-sm hover:shadow-md transition-shadow"
-          >
-            <div className="flex gap-4">
-              {/* Image + Badge */}
-              <div className="relative h-24 w-24 rounded-xl overflow-hidden flex-shrink-0">
-                 <img
-                  src={item.images}
-                  alt={item.foodName}
-                  
-                  className="object-cover transition-transform duration-300 group-hover:scale-110"
-                /> 
-                {item.isOfferAvailable && (
-                  <div className="absolute top-1 left-1">
-                    <span className="badge bg-red-500 text-white text-xs">Flash Deal</span>
+              {/* Menu Items */}
+              <div className="space-y-8">
+                {menuItems
+                  .filter((item) =>
+                    item.foodName
+                      .toLowerCase()
+                      .includes(searchQuery.toLowerCase())
+                  )
+                  .map((item) => (
+                    <div
+                      key={item._id}
+                      className="group border rounded-xl p-4 bg-white dark:bg-dark-800 shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex gap-4">
+                        {/* Image + Badge */}
+                        <div className="relative h-24 w-24 rounded-xl overflow-hidden flex-shrink-0">
+                          <img
+                            src={item.images}
+                            alt={item.foodName}
+                            className="object-cover transition-transform duration-300 group-hover:scale-110"
+                          />
+                          {item.isOfferAvailable && (
+                            <div className="absolute top-1 left-1">
+                              <span className="badge bg-red-500 text-white text-xs">
+                                Flash Deal
+                              </span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Info */}
+                        <div className="flex-1 min-w-0 space-y-1">
+                          <div className="flex justify-between items-start">
+                            <h3 className="font-bold text-lg text-gray-800 dark:text-gray-100 group-hover:text-primary-600 transition-colors">
+                              {item.foodName}
+                            </h3>
+                            {item.isAvailable ? (
+                              <span className="text-xs text-green-600 bg-green-100 dark:bg-green-800 dark:text-green-300 px-2 py-0.5 rounded-full">
+                                Available
+                              </span>
+                            ) : (
+                              <span className="text-xs text-red-600 bg-red-100 dark:bg-red-800 dark:text-red-300 px-2 py-0.5 rounded-full">
+                                Unavailable
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {item.categoryName}
+                          </p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                            {item.description || "No description available."}
+                          </p>
+
+                          {/* Pricing and Offer */}
+                          <div className="flex justify-between items-center mt-2">
+                            <div className="space-x-2">
+                              {item.flashDeal.newPrice ? (
+                                <>
+                                  <span className="text-sm line-through text-gray-400">
+                                    ${parseFloat(item.price).toFixed(2)}
+                                  </span>
+                                  <span className="text-md font-semibold text-primary-600 dark:text-primary-400">
+                                    $
+                                    {parseFloat(
+                                      item.flashDeal.newPrice
+                                    ).toFixed(2)}
+                                  </span>
+                                </>
+                              ) : (
+                                <span className="text-md font-semibold text-primary-600 dark:text-primary-400">
+                                  ${parseFloat(item.price).toFixed(2)}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Add to Cart Button */}
+                            <Link
+                              href={`/restaurants/${params.restaurantId}/item/${item._id}`}
+                            >
+                              <button className="btn btn-primary btn-sm px-4 py-1 rounded-full text-sm font-medium">
+                                view
+                              </button>
+                            </Link>
+                          </div>
+
+                          {/* Ratings */}
+                          {/* <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  {item.ratingID.length} Rating{item.ratingID.length !== 1 ? "s" : ""}
+                </div> */}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                {/* Empty State */}
+                {menuItems.filter((item) =>
+                  item.foodName
+                    .toLowerCase()
+                    .includes(searchQuery.toLowerCase())
+                ).length === 0 && (
+                  <div className="text-center py-12">
+                    <p className="text-gray-600 dark:text-gray-400">
+                      No menu items found matching "{searchQuery}"
+                    </p>
+                    <button
+                      className="text-primary-600 dark:text-primary-400 hover:underline mt-2"
+                      onClick={() => setSearchQuery("")}
+                    >
+                      Clear search
+                    </button>
                   </div>
                 )}
               </div>
-
-              {/* Info */}
-              <div className="flex-1 min-w-0 space-y-1">
-                <div className="flex justify-between items-start">
-                  <h3 className="font-bold text-lg text-gray-800 dark:text-gray-100 group-hover:text-primary-600 transition-colors">
-                    {item.foodName}
-                  </h3>
-                  {item.isAvailable ? (
-                    <span className="text-xs text-green-600 bg-green-100 dark:bg-green-800 dark:text-green-300 px-2 py-0.5 rounded-full">
-                      Available
-                    </span>
-                  ) : (
-                    <span className="text-xs text-red-600 bg-red-100 dark:bg-red-800 dark:text-red-300 px-2 py-0.5 rounded-full">
-                      Unavailable
-                    </span>
-                  )}
-                </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{item.categoryName}</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                  {item.description || "No description available."}
-                </p>
-
-                {/* Pricing and Offer */}
-                <div className="flex justify-between items-center mt-2">
-                  <div className="space-x-2">
-                    {item.flashDeal.newPrice ? (
-                      <>
-                        <span className="text-sm line-through text-gray-400">${parseFloat(item.price).toFixed(2)}</span>
-                        <span className="text-md font-semibold text-primary-600 dark:text-primary-400">
-                          ${parseFloat(item.flashDeal.newPrice).toFixed(2)}
-                        </span>
-                      </>
-                    ) : (
-                      <span className="text-md font-semibold text-primary-600 dark:text-primary-400">
-                        ${parseFloat(item.price).toFixed(2)}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Add to Cart Button */}
-                  <Link href={`/restaurants/${params.restaurantId}/item/${item._id}`}>
-                  <button className="btn btn-primary btn-sm px-4 py-1 rounded-full text-sm font-medium">
-                    view
-                  </button>
-                  </Link>
-                </div>
-
-                {/* Ratings */}
-                {/* <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  {item.ratingID.length} Rating{item.ratingID.length !== 1 ? "s" : ""}
-                </div> */}
-              </div>
             </div>
-          </div>
-        ))}
-
-      {/* Empty State */}
-      {menuItems.filter((item) =>
-        item.foodName.toLowerCase().includes(searchQuery.toLowerCase())
-      ).length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-gray-600 dark:text-gray-400">
-            No menu items found matching "{searchQuery}"
-          </p>
-          <button
-            className="text-primary-600 dark:text-primary-400 hover:underline mt-2"
-            onClick={() => setSearchQuery("")}
-          >
-            Clear search
-          </button>
-        </div>
-      )}
-    </div>
-  </div>
-)}
-
-
+          )}
 
           {/* Tabs */}
           {activeTab === "Reviews" && (
@@ -511,12 +537,12 @@ export default function RestaurantMenuPage() {
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center dark:bg-dark-700">
                       <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
-                        {review.userData.username?.charAt(0).toUpperCase()}
+                        {review.username?.charAt(0).toUpperCase()}
                       </span>
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-800 dark:text-gray-100">
-                        {review.userData.username}
+                        {review.username}
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
                         Rated {review.count} star(s)
