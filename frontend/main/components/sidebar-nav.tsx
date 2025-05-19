@@ -3,6 +3,7 @@
 import type React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { logout } from "@/api";
 
 export interface SidebarNavItem {
   title: string;
@@ -38,6 +39,10 @@ export function SidebarNav({ items }: SidebarNavProps) {
       {/* Logout Button */}
       <Link
         href="/"
+        onClick={() => {
+          localStorage.removeItem("userProfile");
+          logout();
+        }}
         className="flex dark:text-white items-center space-x-2 rounded-md p-2 text-sm font-medium text-muted-foreground "
       >
         <span>Logout</span>
