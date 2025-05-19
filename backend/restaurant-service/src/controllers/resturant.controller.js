@@ -74,6 +74,8 @@ exports.getAllHotels = async (req, res) => {
   try {
     const { name, address, cuisine, dietary, category, sort, search, location } = req.query;
 
+    console.log("get all hotel");
+    
     const query = {};
 
     if (search) {
@@ -110,8 +112,13 @@ exports.getAllHotels = async (req, res) => {
     } else if (sort === "z-a") {
       sortOptions = { hotelName: -1 };
     }
+    console.log("query", query);
+    console.log("sortOptions", sortOptions);
+    
 
     const hotels = await Hotel.find(query).sort(sortOptions);
+    console.log("hotels", hotels);
+    
     res.status(200).json(hotels);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -195,7 +202,7 @@ exports.rateHotel = async (req, res) => {
 
     const updatedHotel = await Hotel.findByIdAndUpdate(
       req.params.id,
-      { $inc: { rating: rating } }, // Increment the rating field
+      { $inc: { rating: rating } },
       { new: true }
     );
 
@@ -204,6 +211,56 @@ exports.rateHotel = async (req, res) => {
     }
 
     res.status(200).json(updatedHotel);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}; // <-- This was missing before
+
+// Toggle hotel authorization
+exports.authorizeHotel = async (req, res) => {
+  const { hotelId } = req.body;
+
+  if (!hotelId) {
+    return res.status(400).json({ message: "Hotel ID is required" });
+  }
+
+  try {
+    const updatedHotel = await Hotel.findByIdAndUpdate(
+      hotelId,
+      { isAuthorized: true },
+      { new: true }
+    );
+
+    if (!updatedHotel) {
+      return res.status(404).json({ message: "Hotel not found" });
+    }
+
+    res.json(updatedHotel);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Revoke hotel authorization
+exports.revokeHotel = async (req, res) => {
+  const { hotelId } = req.body;
+
+  if (!hotelId) {
+    return res.status(400).json({ message: "Hotel ID is required" });
+  }
+
+  try {
+    const updatedHotel = await Hotel.findByIdAndUpdate(
+      hotelId,
+      { isAuthorized: false },
+      { new: true }
+    );
+
+    if (!updatedHotel) {
+      return res.status(404).json({ message: "Hotel not found" });
+    }
+
+    res.json(updatedHotel);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
