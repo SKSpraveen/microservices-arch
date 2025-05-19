@@ -189,7 +189,7 @@ export const logout = async (): Promise<void> => {
   try {
     await authAPI.post("/logout", {}, { withCredentials: true });
     clearToken(); 
-    window.location.href = "/login"; 
+    window.location.href = "/"; 
   } catch (error) {
     console.error("Logout failed:", error);
   }
