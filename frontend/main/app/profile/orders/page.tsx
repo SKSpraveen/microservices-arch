@@ -11,7 +11,7 @@ export default function OrdersPage() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await axios.get(`http://localhost:3000/orders/user/${userProfile._id}`)
+        const res = await axios.get(`http://localhost:3000/order/orders/user/${userProfile._id}`)
         setOrders(res.data)
       } catch (err) {
         console.error("Failed to load orders:", err)
@@ -23,7 +23,7 @@ export default function OrdersPage() {
 
   const handleCancelOrder = async (orderId: any) => {
     try {
-      await axios.post(`http://localhost:3000/orders/${orderId}/cancel`)
+      await axios.post(`http://localhost:3000/order/orders/${orderId}/cancel`)
       setOrders((prev: any) =>
         prev.map((order: any) =>
           order._id === orderId ? { ...order, status: "canceled" } : order
