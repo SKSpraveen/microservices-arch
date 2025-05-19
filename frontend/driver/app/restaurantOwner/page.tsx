@@ -52,7 +52,13 @@ export default function RestaurantDashboard() {
 					const ordersResponse = await axios.get(
 						`http://localhost:3000/orders/hotel/${hotel._id}`
 					);
-					allOrders.push(...ordersResponse.data);
+          const orders = ordersResponse.data;
+
+          if (Array.isArray(orders)) {
+            allOrders.push(...orders);
+          } else {
+            console.warn(`Unexpected response for hotel ${hotel._id}:`, orders);
+          }
 				}
 
 				// Set the orders for all hotels
@@ -91,6 +97,46 @@ export default function RestaurantDashboard() {
 			window.location.href = "/signin";
 		}
 	})
+
+  const handleCancelOrder = async (orderId: string) => {
+    console.log("triggered");
+    
+    try {
+      console.log("triggered 2");
+      
+      const res = await axios.put(`http://localhost:3000/orders/${orderId}`, {
+        status: "Cancelled",
+      });
+      console.log("status",res.status);
+      
+      if (res.status === 200) {
+        setOrders((prevOrders) =>
+          prevOrders.map((order) =>
+            order._id === orderId ? { ...order, status: "Cancelled" } : order
+          )
+        );
+      }
+    } catch (err) {
+      console.error("Error cancelling order", err);
+    }
+  };
+
+  const handleUpdateOrderStatus = async (orderId: string, newStatus: string) => {
+    try {
+      const res = await axios.put(`http://localhost:3000/orders/${orderId}`, {
+        status: newStatus,
+      });
+      if (res.status === 200) {
+        setOrders((prevOrders) =>
+          prevOrders.map((order) =>
+            order._id === orderId ? { ...order, status: newStatus } : order
+          )
+        );
+      }
+    } catch (err) {
+      console.error("Error updating order status", err);
+    }
+  };
 
 	return (
 		<div className="flex min-h-screen bg-gray-900 text-gray-200">
@@ -188,33 +234,66 @@ export default function RestaurantDashboard() {
 										<tr className="bg-gray-700">
 											<th className="px-6 py-3 text-left">Order ID</th>
 											<th className="px-6 py-3 text-left">Customer</th>
+											<th className="px-6 py-3 text-left">Total Amount</th>
 											<th className="px-6 py-3 text-left">Items</th>
 											<th className="px-6 py-3 text-left">Status</th>
 											<th className="px-6 py-3 text-left">Time</th>
+											<th className="px-6 py-3 text-left">Actions</th>
 										</tr>
 									</thead>
 									<tbody>
-										{Array.isArray(orders) &&
-											orders.map((order) => (
-												<tr key={order.id} className="border-t border-gray-700">
-													<td className="px-6 py-4">{order.id}</td>
-													<td className="px-6 py-4">{order.customer}</td>
-													<td className="px-6 py-4">{order.items}</td>
-													<td className="px-6 py-4">
-														<span
-															className={`px-2 py-1 rounded-full text-sm ${
-																order.status === "Delivered"
-																	? "bg-green-700 text-green-300"
-																	: "bg-yellow-700 text-yellow-300"
-															}`}
-														>
-															{order.status}
-														</span>
-													</td>
-													<td className="px-6 py-4">{order.time}</td>
-												</tr>
-											))}
-									</tbody>
+                    {Array.isArray(orders) &&
+                      orders.map((order) => (
+                        <tr key={order._id} className="border-t border-gray-700">
+                          <td className="px-6 py-4">{order.paymentIntentId}</td>
+                          <td className="px-6 py-4">{order.userId}</td>
+                          <td className="px-6 py-4">${order.totalAmount}</td>
+                          <td className="px-6 py-4">
+                            {order.items.map((item:any, index: any) => (
+                              <div key={index}>
+                                {item.name} ({item.quantity} x ${item.price})
+                              </div>
+                            ))}
+                          </td>
+                          <td className="px-6 py-4">
+                            <span
+                              className={`px-2 py-1 rounded-full text-sm ${
+                                order.status === "Delivered"
+                                  ? "bg-green-700 text-green-300"
+                                  : "bg-yellow-700 text-yellow-300"
+                              }`}
+                            >
+                              {order.status}
+                            </span>
+                          </td>
+                          
+                          <td className="px-6 py-4">
+                            {new Date(order.createdAt).toLocaleString()}
+                          </td>
+                          <td className="px-6 py-4">
+  {order.status === "pending" ? (
+    <>
+      <button
+        onClick={() => handleCancelOrder(order._id)}
+        className="bg-red-600 text-white px-3 py-1 rounded-md"
+      >
+        Cancel Order
+      </button>
+      <button
+        onClick={() => handleUpdateOrderStatus(order._id, "Delivered")}
+        className="bg-green-600 text-white px-3 py-1 rounded-md ml-2"
+      >
+        Mark as Delivered
+      </button>
+    </>
+  ) : (
+    <span className="text-green-700 font-semibold">Done</span>
+  )}
+</td>
+
+                        </tr>
+                      ))}
+                  </tbody>
 								</table>
 							</div>
 						</div>
