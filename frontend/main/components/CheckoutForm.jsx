@@ -3,17 +3,13 @@ import { useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js'
 import axios from 'axios';
 import { useState } from 'react';
 
-interface CheckoutFormProps {
-  selectedItems: { id: number; name: string; price: number; quantity: number }[];
-}
-
-export default function CheckoutForm({ selectedItems }: CheckoutFormProps) {
+export default function CheckoutForm({ selectedItems }) {
   const stripe = useStripe();
   const elements = useElements();
   const [message, setMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
   
     if (!stripe || !elements) return;
@@ -35,7 +31,7 @@ export default function CheckoutForm({ selectedItems }: CheckoutFormProps) {
         await axios.post('/api/save-order', {
           paymentIntentId: paymentIntent.id,
           totalAmount: localStorage.getItem("totalAmount"), // You can fetch the total amount from your backend
-        items: JSON.parse(localStorage.getItem("selectedItems") as string),
+        items: JSON.parse(localStorage.getItem("selectedItems")),
         });
   
         setMessage('Payment succeeded!');
