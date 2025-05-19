@@ -120,8 +120,9 @@ export default function HotelsPage() {
       const items = await res.data.data
       setMenuItems(items)
     } else {
-      const res = await fetch(`http://localhost:3000/api/hotel/viewComplaints?hotelId=${hotel._id}`)
-      const comp = await res.json()
+      const res = await axios.get(`http://localhost:3000/api/review/`)
+      const comp = await res.data
+      console.log(res.data)
       setComplaints(comp)
     }
   }
@@ -349,21 +350,28 @@ export default function HotelsPage() {
               </div>
             ) : (
               <div className="max-h-[400px] overflow-y-auto space-y-4">
-                {complaints.length === 0 ? (
-                  <p className="text-center py-4 text-muted-foreground">No complaints found</p>
-                ) : (
-                  complaints.map((comp, index) => (
-                    <Card key={index}>
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-start mb-2">
-                          <p className="text-sm font-medium">{new Date(comp.date).toLocaleString()}</p>
-                        </div>
-                        <p className="text-sm">{comp.text}</p>
-                      </CardContent>
-                    </Card>
-                  ))
-                )}
-              </div>
+  {complaints.length === 0 ? (
+    <p className="text-center py-4 text-muted-foreground">No complaints found</p>
+  ) : (
+    complaints.map((complain: any, index: any) => (
+      <Card key={index}>
+        <CardContent className="p-4">
+          <div className="flex justify-between items-start mb-2">
+            <p className="text-sm font-medium text-muted-foreground">
+              {new Date(complain.createdAt).toLocaleString()}
+            </p>
+            <span className="text-xs bg-gray-200 px-2 py-1 rounded-full">
+              {complain.type}
+            </span>
+          </div>
+          <p className="text-base font-semibold mb-1">{complain.comment}</p>
+          <p className="text-sm text-muted-foreground">Helpful: {complain.count}</p>
+        </CardContent>
+      </Card>
+    ))
+  )}
+</div>
+
             )}
 
             <DialogFooter>
