@@ -16,8 +16,13 @@ export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const storedLogin = localStorage.getItem("isLoggedIn") === "true";
-    setIsLoggedIn(storedLogin);
+    const authentication = localStorage.getItem("authToken");
+    if( !authentication) {
+      router.push("/signin");
+    }
+    else {
+      setIsLoggedIn(true);
+    }
   }, []);
 
   const handleMouseEnter = () => {
@@ -48,7 +53,12 @@ export default function Navbar() {
 
   useEffect(() => {
     const checkUserAuth = async () => {
-      const isAuthenticated = await checkAuth();
+      const token = getToken();
+      let isAuthenticated;
+      if(!!token) {
+         isAuthenticated = true;
+      } else isAuthenticated = false;
+      
     };
 
     checkUserAuth();

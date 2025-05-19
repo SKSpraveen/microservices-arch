@@ -41,7 +41,7 @@ export const activateAccountController = async (req, res) => {
 export const loginController = async (req, res) => {
   try {
     const { emailOrUsername, password } = req.body;
-    const { success, token, session, message } = await login(emailOrUsername, password, req);
+    const { success, token, session, message, data } = await login(emailOrUsername, password, req);
 
     if (message === 'Session already active on this device') {
       return res.status(200).json({ message });
@@ -57,7 +57,7 @@ export const loginController = async (req, res) => {
       maxAge: 24 * 60 * 60 * 1000,
     });
 
-    return res.status(200).json({ success: true, token, session });
+    return res.status(200).json({ success: true, token, session, user:data });
   } catch (error) {
     console.error(error);
     return res.status(error.statusCode || 500).json({ success: false, message: error.message });

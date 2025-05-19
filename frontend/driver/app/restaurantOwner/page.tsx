@@ -14,7 +14,7 @@ import Hotel from "./hotel";
 import AddHotel from "./addHotels";
 import { useEffect } from "react";
 import axios from "axios";
-import { fetchRestaurants } from "@/api";
+import { fetchRestaurants, logout } from "@/api";
 
 export default function RestaurantDashboard() {
 	const restaurantStats = {
@@ -85,11 +85,17 @@ export default function RestaurantDashboard() {
 
 		return netIncome;
 	};
+	useEffect(() => {
+		const auth = localStorage.getItem("authToken");
+		if( !auth ){
+			window.location.href = "/signin";
+		}
+	})
 
 	return (
 		<div className="flex min-h-screen bg-gray-900 text-gray-200">
 			{/* Sidebar */}
-			<aside className="w-64 bg-gray-800 shadow-lg p-6">
+			<aside className="relative w-64 bg-gray-800 shadow-lg p-6">
 				<div className="mb-10">
 					<h2 className="text-2xl font-bold">Hello {}</h2>
 				</div>
@@ -105,6 +111,14 @@ export default function RestaurantDashboard() {
 						onClick={() => setActiveSection("hotels")}
 					/>
 				</nav>
+				<button className="absolute bottom-2 mt-10 w-[200px] bg-red-600 text-white py-2 rounded-lg hover:bg-red-700" onClick={async () => {
+					if (localStorage.getItem('userProfile')) localStorage.removeItem('userProfile')
+					await logout()
+				}}>
+					{/* Add an icon here if needed */}
+					<FaClinicMedical className="inline mr-2" />
+					Logout
+				</button>
 			</aside>
 
 			{/* Main Content */}

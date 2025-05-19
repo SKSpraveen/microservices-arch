@@ -27,11 +27,7 @@ const sidebarItems = [
     href: "/profile/payment",
     icon: <span className="text-lg">💳</span>,
   },
-  {
-    title: "Security",
-    href: "/profile/security",
-    icon: <span className="text-lg">🔒</span>,
-  },
+
   {
     title: "Settings",
     href: "/profile/settings",
