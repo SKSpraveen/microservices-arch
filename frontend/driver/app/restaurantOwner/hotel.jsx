@@ -13,7 +13,9 @@ export default function Hotel() {
   const [showModal, setShowModal] = useState(false);
   const [editingHotelId, setEditingHotelId] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [addHotelClick, setAddHotelClick] = useState(false);
   const [newHotel, setNewHotel] = useState({
+    userID: '',
     hotelName: '',
     hotelAddress: '',
     location: '',
@@ -53,9 +55,11 @@ export default function Hotel() {
 };
 
   useEffect(() => {
+    
     const fetchData = async () => {
       try {
-        const data = await fetchRestaurants(filters);
+        let data = await fetchRestaurants(filters);
+       data = data.filter(d => d.userID === JSON.parse(localStorage.getItem("userProfile")).userId)
         setHotels(data);
       } catch (err) {
         console.error("Error fetching restaurants", err);
@@ -65,6 +69,7 @@ export default function Hotel() {
   }, [filters]);
 
   const handleAddOrUpdateHotel = async () => {
+    setAddHotelClick(!addHotelClick)
     const formErrors = validateForm();
     if (Object.keys(formErrors).length > 0) {
       setErrors(formErrors);
@@ -79,9 +84,11 @@ export default function Hotel() {
       const res = await axios.post('https://api.cloudinary.com/v1_1/dxhzkog1c/image/upload', formData);
       bannerUrl = res.data.secure_url;
     }
-
+    const userID = JSON.parse(localStorage.getItem("userProfile")).userId
+  
     const hotelData = {
       id: editingHotelId, // Use timestamp for new ones
+      userID: userID,
       ...newHotel,
       rating: parseFloat(newHotel.rating),
       categoriesprovider: newHotel.categoriesprovider.split(',').map(item => item.trim()),
@@ -101,6 +108,7 @@ export default function Hotel() {
 
       } else {
         // Create new
+        alert(hotelData.userID)
         const newRestaurant = await createRestaurant(hotelData);
         setHotels(prevHotels => [...prevHotels, newRestaurant]);
       }
@@ -122,6 +130,8 @@ export default function Hotel() {
       setSelectedFile(null); // Clear file
     } catch (error) {
       console.error("Error handling add/update hotel:", error);
+    }finally {
+      setAddHotelClick(false)
     }
   };
 
@@ -323,8 +333,11 @@ export default function Hotel() {
               <button 
                 onClick={handleAddOrUpdateHotel}
                 className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded"
+                disabled={addHotelClick}
               >
-                {editingHotelId ? 'Update Hotel' : 'Save Hotel'}
+                {
+                  addHotelClick ? "working..." : (editingHotelId ? "Update Hotel" : "Add Hotel")
+                }
               </button>
             </div>
           </div>

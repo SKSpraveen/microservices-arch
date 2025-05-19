@@ -142,6 +142,9 @@ export default function SignUpPage() {
       const response = await signup(dataToSubmit);
       if (response?.data?.email && response?.data?.role) {
         router.push(`/activation?email=${response.data.email}&role=${response.data.role}`);
+        localStorage.setItem("userRole", response.data.role);
+        setCurrentUserRole(response.data.role);
+        localStorage.setItem("userProfile", JSON.stringify(response.data));
       } else {
         throw new Error("Unexpected server response");
       }

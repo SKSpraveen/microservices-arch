@@ -31,7 +31,7 @@ export default function HotelDetailPage() {
 
   const fetchFoodItems = async () => {
     try {
-      const res = await axios.get(`http://localhost:3003/api/hotel/foods/getById/${hotelId}`, { withCredentials: true });
+      const res = await axios.get(`http://localhost:3000/api/hotel/foods/getById/${hotelId}`, { withCredentials: true });
       console.log('API Response:', res.data);
   
       const data = res.data;
@@ -185,7 +185,7 @@ function AddMenuModal({ hotelId, onClose, onFoodAdded }: AddMenuModalProps) {
         console.log(imageUrl);
         
       }
-      await axios.post('http://localhost:3003/api/hotel/foods', {
+      await axios.post('http://localhost:3000/api/hotel/foods', {
         ...formData,
         images: imageUrl,
         price: Number(formData.price),
