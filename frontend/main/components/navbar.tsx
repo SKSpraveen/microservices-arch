@@ -18,7 +18,7 @@ export default function Navbar() {
   useEffect(() => {
     const authentication = localStorage.getItem("authToken");
     if( !authentication) {
-      router.push("/");
+      setIsLoggedIn(false);
     }
     else {
       setIsLoggedIn(true);
