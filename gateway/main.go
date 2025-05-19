@@ -75,7 +75,7 @@ func main() {
 	})
 
 	r.Any("/order/*path", func(c *gin.Context) {
-		proxyRequest(orderService, "/api/users", c)
+		proxyRequest(orderService, "/order", c)
 	})
 
 	r.Any("/api/payment/*path", func(c *gin.Context) {
