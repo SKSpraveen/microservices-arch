@@ -15,8 +15,10 @@ import AddHotel from "./addHotels";
 import { useEffect } from "react";
 import axios from "axios";
 import { fetchRestaurants, logout } from "@/api";
+import { useRouter } from "next/navigation";
 
 export default function RestaurantDashboard() {
+  const router = useRouter();
 	const restaurantStats = {
 		totalOrders: 150,
 		activeDeliveries: 12,
@@ -28,6 +30,7 @@ export default function RestaurantDashboard() {
 	const [hotels, setHotels] = useState<any[]>([]);
 	const [orders, setOrders] = useState<any[]>([]);
 	const [activeSection, setActiveSection] = useState("dashboard");
+  
 
 	useEffect(() => {
     const fetchHotelsAndOrders = async () => {
@@ -170,8 +173,10 @@ export default function RestaurantDashboard() {
 					/>
 				</nav>
 				<button className="absolute bottom-2 mt-10 w-[200px] bg-red-600 text-white py-2 rounded-lg hover:bg-red-700" onClick={async () => {
-					if (localStorage.getItem('userProfile')) localStorage.removeItem('userProfile')
+					if (localStorage.getItem('userProfile')) {localStorage.removeItem('userProfile')
 					await logout()
+        router.push("/signin");
+          }
 				}}>
 					{/* Add an icon here if needed */}
 					<FaClinicMedical className="inline mr-2" />
