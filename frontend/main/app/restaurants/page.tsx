@@ -80,41 +80,39 @@ export default function RestaurantsPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
       <Navbar />
-
-      {/* Hero */}
-      <section className="relative py-12 md:py-16 bg-primary-600 dark:bg-primary-300">
-        <Image
-          src="/placeholder.svg?height=400&width=1920"
-          alt="Food pattern"
-          fill
-          className="absolute inset-0 object-cover opacity-10"
-        />
-        <div className="container mx-auto relative z-10 px-4 text-center space-y-4">
-          <h1 className="text-3xl md:text-4xl font-bold text-white">Discover Restaurants Near You</h1>
-          <p className="text-white/90 text-lg">Find and order from the best local spots</p>
+      {/* Hero Section */}
+      <section className="relative py-16 md:py-20 overflow-hidden bg-gradient-to-r from-primary-400 via-primary-600 to-primary-800 text-white">
+        <div className="absolute inset-0 opacity-10 pointer-events-none">
+          <Image src="/placeholder.svg?height=400&width=1920" alt="Pattern" fill />
+        </div>
+        <div className="container mx-auto px-4 relative z-10 text-center max-w-3xl mx-auto">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight">
+            Discover Restaurants Near You
+          </h1>
+          <p className="text-lg md:text-xl text-white/90 mb-8">Find and order from the best local spots</p>
 
           {/* Search + Location */}
-          <div className="flex flex-col sm:flex-row gap-3 mt-4 max-w-3xl mx-auto bg-white p-4 rounded-xl shadow">
+          <div className="flex flex-col sm:flex-row gap-4 mt-4 bg-white/10 backdrop-blur-md p-4 rounded-2xl shadow-lg border border-white/20">
             <div className="relative flex-1">
-              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/70" />
               <input
                 type="text"
                 placeholder="Enter location"
                 value={filters.location}
                 onChange={(e) => setFilters({ ...filters, location: e.target.value })}
-                className="w-full px-10 py-2 rounded-md focus:ring-primary-500 border"
+                className="w-full pl-12 pr-4 py-3 rounded-xl bg-white/20 focus:ring-2 focus:ring-white/50 outline-none text-white placeholder:text-white/70"
               />
             </div>
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/70" />
               <input
                 type="text"
                 placeholder="Search for cuisine or restaurant"
                 value={filters.search}
                 onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-                className="w-full px-10 py-2 rounded-md focus:ring-primary-500 border"
+                className="w-full pl-12 pr-4 py-3 rounded-xl bg-white/20 focus:ring-2 focus:ring-white/50 outline-none text-white placeholder:text-white/70"
               />
             </div>
           </div>
@@ -122,8 +120,8 @@ export default function RestaurantsPage() {
       </section>
 
       {/* Categories */}
-      <section className="py-6 ">
-        <div className="container mx-auto flex flex-wrap justify-center gap-4">
+      <section className="py-8">
+        <div className="container mx-auto flex flex-wrap justify-center gap-3">
           {Object.keys(categoryIcons).map((category) => (
             <button
               key={category}
@@ -133,58 +131,73 @@ export default function RestaurantsPage() {
                   search: category === "All" ? "" : category,
                 }))
               }
-              className="flex items-center dark:text-primary-500 gap-2 px-4 py-2 rounded-full border hover:bg-primary-50 transition"
+              className={`group flex items-center gap-2 dark:text-white px-4 py-2 rounded-full border dark:border-gray-700 dark:hover:border-primary-500 border-gray-200 hover:bg-primary-500 hover:text-white dark:hover:bg-primary-600 transition-all transform hover:scale-105`}
             >
               {categoryIcons[category]}
-              <span className="text-sm">{category}</span>
+              <span className="text-sm font-medium">{category}</span>
             </button>
           ))}
         </div>
       </section>
 
-      <section className="container mx-auto px-4 md:px-6 py-8 flex flex-col lg:flex-row gap-8">
-        {/* Filters */}
+      {/* Main Content */}
+      <section className="container mx-auto px-4 md:px-6 py-10 flex flex-col lg:flex-row gap-8">
+        {/* Filters Sidebar */}
         <aside className="w-full lg:w-1/4 space-y-6">
-          <div className="bg-white rounded-lg shadow-sm">
-            <div className="flex items-center justify-between bg-primary-600 text-white px-4 py-2 rounded-t-md">
-              <h3 className="text-lg font-medium">Filters</h3>
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg backdrop-blur-sm border dark:border-gray-700">
+            <div className="flex items-center justify-between bg-gradient-to-r from-primary-600 to-primary-500 text-white px-6 py-3 rounded-t-xl">
+              <h3 className="text-lg font-semibold">Filters</h3>
               <Filter className="h-5 w-5" />
             </div>
-            <div className="p-4 space-y-4">
+            <div className="p-6 space-y-6">
               {/* Cuisine Filter */}
               <div>
-                <h4 className="font-semibold mb-2">Cuisine</h4>
+                <h4 className="font-semibold mb-3 text-gray-800 dark:text-gray-200">Cuisine</h4>
                 {cuisines.map((cuisine) => (
-                  <div key={cuisine} className="flex items-center space-x-2">
+                  <div key={cuisine} className="flex items-center space-x-3 mb-2">
                     <input
                       type="checkbox"
+                      id={`cuisine-${cuisine}`}
                       checked={filters.cuisine.includes(cuisine)}
                       onChange={() => toggleFilter("cuisine", cuisine)}
-                      className="accent-primary-600"
+                      className="accent-primary-600 w-4 h-4 rounded"
                     />
-                    <label>{cuisine}</label>
+                    <label htmlFor={`cuisine-${cuisine}`} className="cursor-pointer text-sm dark:text-gray-300">
+                      {cuisine}
+                    </label>
                   </div>
                 ))}
               </div>
-              <hr />
+              <hr className="border-gray-200 dark:border-gray-700" />
               {/* Dietary Filter */}
               <div>
-                <h4 className="font-semibold mb-2">Dietary</h4>
+                <h4 className="font-semibold mb-3 text-gray-800 dark:text-gray-200">Dietary</h4>
                 {dietaryOptions.map((option) => (
-                  <div key={option} className="flex items-center space-x-2">
+                  <div key={option} className="flex items-center space-x-3 mb-2">
                     <input
                       type="checkbox"
+                      id={`dietary-${option}`}
                       checked={filters.dietary.includes(option)}
                       onChange={() => toggleFilter("dietary", option)}
-                      className="accent-primary-600"
+                      className="accent-primary-600 w-4 h-4 rounded"
                     />
-                    <label>{option}</label>
+                    <label htmlFor={`dietary-${option}`} className="cursor-pointer text-sm dark:text-gray-300">
+                      {option}
+                    </label>
                   </div>
                 ))}
               </div>
               <button
-                onClick={() => setFilters({ cuisine: [], dietary: [], search: "", location: "", sort: "a-z" })}
-                className="btn btn-primary w-full mt-4"
+                onClick={() =>
+                  setFilters({
+                    cuisine: [],
+                    dietary: [],
+                    search: "",
+                    location: "",
+                    sort: "a-z",
+                  })
+                }
+                className="w-full py-2 px-4 rounded-lg bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-600 dark:text-red-300 font-medium transition-colors"
               >
                 Clear Filters
               </button>
@@ -192,61 +205,73 @@ export default function RestaurantsPage() {
           </div>
         </aside>
 
-        {/* Restaurants */}
+        {/* Restaurants Grid */}
         <main className="flex-1">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Restaurants</h2>
-            <button onClick={handleSortToggle} className="btn btn-outline rounded-full flex items-center gap-2 text-sm">
-              {filters.sort === "a-z" ? "A-Z" : "Z-A"} <ChevronDown className="h-4 w-4" />
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Restaurants</h2>
+            <button
+              onClick={handleSortToggle}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+            >
+              Sort: {filters.sort === "a-z" ? "A-Z" : "Z-A"}
+              <ChevronDown className="h-4 w-4" />
             </button>
           </div>
 
           {loading ? (
-            <p>Loading...</p>
+            <p className="text-center text-gray-500 dark:text-gray-400">Loading...</p>
           ) : restaurants.length === 0 ? (
-            <p className="text-gray-500">No restaurants found.</p>
+            <p className="text-center text-gray-500 dark:text-gray-400">No restaurants found.</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {restaurants.map((restaurant) => (
-                <div key={restaurant._id} className="rounded-xl overflow-hidden bg-white shadow-sm">
-                  <div className="relative aspect-[4/3]">
+                <div
+                  key={restaurant._id}
+                  className="rounded-xl overflow-hidden bg-white dark:bg-gray-800 shadow-md hover:shadow-xl transition-shadow duration-300 border dark:border-gray-700"
+                >
+                  <div className="relative aspect-[4/3] group">
                     <Image
                       src={restaurant.banner}
                       alt={restaurant.hotelName}
                       fill
-                      className="object-cover"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                     {restaurant.isFeatured && (
-                      <span className="absolute top-2 left-2 bg-primary-600 text-white text-xs px-2 py-1 rounded">
+                      <span className="absolute top-3 left-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs px-2 py-1 rounded-full font-medium">
                         Featured
                       </span>
                     )}
-                    <span className="absolute top-2 right-2 bg-white text-sm px-2 rounded shadow">
-                      {restaurant.ordersCount}
+                    <span className="absolute top-3 right-3 bg-white dark:bg-gray-900 text-sm px-2 py-1 rounded-full shadow-md dark:text-gray-200">
+                      {restaurant.ordersCount} Orders
                     </span>
-                    <span className="absolute bottom-2 right-2 bg-white text-sm px-2 rounded shadow flex items-center">
-                      <Clock className="h-4 w-4 mr-1" />
+                    <span className="absolute bottom-3 right-3 bg-white dark:bg-gray-900 text-sm px-2 py-1 rounded-full shadow-md flex items-center gap-1 dark:text-gray-200">
+                      <Clock className="h-4 w-4" />
                       {restaurant.opentime}
                     </span>
                   </div>
-                  <div className="p-4">
-                    <div className="flex justify-between mb-2">
-                      <h3 className="text-lg font-bold">{restaurant.hotelName}</h3>
-                      <div className="flex items-center gap-1 text-yellow-500 text-sm">
+                  <div className="p-5">
+                    <div className="flex justify-between items-start mb-3">
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                        {restaurant.hotelName}
+                      </h3>
+                      <div className="flex items-center gap-1 text-yellow-500">
                         <Star className="h-4 w-4" />
-                        {restaurant.rating}
+                        <span>{restaurant.rating}</span>
                       </div>
                     </div>
-                    <div className="flex flex-wrap gap-1 mb-3">
+                    <div className="flex flex-wrap gap-2 mb-4">
                       {restaurant.categoriesprovider.map((tag: any, i: number) => (
-                        <span key={i} className="text-xs border px-2 py-0.5 rounded-full">
+                        <span
+                          key={i}
+                          className="text-xs px-2 py-1 rounded-full bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-300"
+                        >
                           {tag}
                         </span>
                       ))}
                     </div>
                     <Link
                       href={`/restaurants/${restaurant._id}`}
-                      className="btn btn-outline w-full"
+                      className="block w-full py-2 px-4 text-center bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors"
                     >
                       View Menu
                     </Link>
@@ -257,9 +282,8 @@ export default function RestaurantsPage() {
           )}
         </main>
       </section>
-
-      <Footer />
     </div>
+
   );
 }
 
