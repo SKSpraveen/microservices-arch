@@ -27,45 +27,45 @@ export default function AnalyticsPage() {
 
   // Mock data for charts
   const userTypeData = [
-    { name: "Customers", value: 540 },
-    { name: "Drivers", value: 120 },
-    { name: "Hotel Owners", value: 85 },
+    { name: "Customers", value: 20 },
+    { name: "Drivers", value: 5 },
+    { name: "Hotel Owners", value: 6 },
   ]
 
   const COLORS = ["#8b5cf6", "#c084fc", "#d8b4fe"]
 
   const orderStatusData = [
-    { name: "Delivered", value: 450 },
-    { name: "In Transit", value: 120 },
-    { name: "Pending", value: 80 },
-    { name: "Cancelled", value: 40 },
+    { name: "Delivered", value: 21 },
+    { name: "In Transit", value: 3 },
+    { name: "Pending", value: 7 },
+    { name: "Cancelled", value: 3 },
   ]
 
   const STATUS_COLORS = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444"]
 
   const dailyOrdersData = [
-    { name: "Mon", orders: 45 },
-    { name: "Tue", orders: 52 },
-    { name: "Wed", orders: 49 },
-    { name: "Thu", orders: 63 },
-    { name: "Fri", orders: 75 },
-    { name: "Sat", orders: 82 },
-    { name: "Sun", orders: 70 },
+    { name: "Mon", orders: 1 },
+    { name: "Tue", orders: 0 },
+    { name: "Wed", orders: 0 },
+    { name: "Thu", orders: 0 },
+    { name: "Fri", orders: 4 },
+    { name: "Sat", orders: 6 },
+    { name: "Sun", orders: 1 },
   ]
 
   const weeklyRevenueData = [
-    { name: "Week 1", revenue: 12500 },
-    { name: "Week 2", revenue: 14200 },
-    { name: "Week 3", revenue: 15800 },
-    { name: "Week 4", revenue: 17500 },
+    { name: "Week 1", revenue: 250 },
+    { name: "Week 2", revenue: 350 },
+    { name: "Week 3", revenue: 10 },
+    { name: "Week 4", revenue: 100 },
   ]
 
   const topHotelsData = [
-    { name: "Grand Plaza Hotel", orders: 120 },
-    { name: "Sunset Resort", orders: 95 },
-    { name: "Mountain View Lodge", orders: 85 },
-    { name: "City Center Hotel", orders: 75 },
-    { name: "Oceanfront Inn", orders: 60 },
+    { name: "Grand Plaza Hotel", orders: 5 },
+    { name: "Sunset Resort", orders: 10 },
+    { name: "Mountain View Lodge", orders: 11 },
+    { name: "City Center Hotel", orders: 1 },
+    { name: "Oceanfront Inn", orders: 23 },
   ]
 
   const hourlyOrdersData = [
@@ -108,7 +108,7 @@ export default function AnalyticsPage() {
           <CardContent className="p-6">
             <div className="flex flex-col space-y-2">
               <p className="text-sm font-medium text-muted-foreground">Total Orders</p>
-              <p className="text-3xl font-bold">1,248</p>
+              <p className="text-3xl font-bold">248</p>
               <p className="text-xs text-green-500">+24% from last period</p>
             </div>
           </CardContent>
@@ -117,7 +117,7 @@ export default function AnalyticsPage() {
           <CardContent className="p-6">
             <div className="flex flex-col space-y-2">
               <p className="text-sm font-medium text-muted-foreground">Total Revenue</p>
-              <p className="text-3xl font-bold">$24,780</p>
+              <p className="text-3xl font-bold">$780</p>
               <p className="text-xs text-green-500">+18% from last period</p>
             </div>
           </CardContent>
@@ -126,7 +126,7 @@ export default function AnalyticsPage() {
           <CardContent className="p-6">
             <div className="flex flex-col space-y-2">
               <p className="text-sm font-medium text-muted-foreground">Active Users</p>
-              <p className="text-3xl font-bold">745</p>
+              <p className="text-3xl font-bold">45</p>
               <p className="text-xs text-green-500">+12% from last period</p>
             </div>
           </CardContent>
@@ -135,7 +135,7 @@ export default function AnalyticsPage() {
           <CardContent className="p-6">
             <div className="flex flex-col space-y-2">
               <p className="text-sm font-medium text-muted-foreground">Active Hotels</p>
-              <p className="text-3xl font-bold">85</p>
+              <p className="text-3xl font-bold">5</p>
               <p className="text-xs text-green-500">+8% from last period</p>
             </div>
           </CardContent>
