@@ -133,7 +133,7 @@ export const login = async (emailOrUsername, password, req) => {
       { new: true, upsert: true }
     );
 
-    return { success: true, token, session: newSession };
+    return { success: true, token, session: newSession, data:user };
   } catch (error) {
     console.error(error);
     throw error;
