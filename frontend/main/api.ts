@@ -25,7 +25,7 @@ const createApiClient = (service: Service): AxiosInstance => {
     withCredentials: true, 
   });
 
-  client.interceptors.request.use((config) => {
+  client.interceptors.request.use((config: any) => {
     const token = localStorage.getItem("authToken");
     if (token) {
       config.headers!.Authorization = `Bearer ${token}`;
@@ -34,8 +34,8 @@ const createApiClient = (service: Service): AxiosInstance => {
   });
 
   client.interceptors.response.use(
-    (response) => response,
-    (error) => {
+    (response: any) => response,
+    (error: any) => {
       if (error.response?.status === 401) {
         localStorage.removeItem("authToken");
         window.location.href = "/login";
@@ -209,7 +209,8 @@ export const getUserProfile = async (): Promise<any> => {
 
 export const updateProfile = async (updatedData: any): Promise<any> => {
   try {
-    const response = await userAPI.put("/", updatedData); 
+    const userProfile = JSON.parse(localStorage.getItem("userProfile") as string);
+    const response = await userAPI.put("/"+ userProfile._id, updatedData); 
     if (response.status === 200) {
       return response.data;
     }

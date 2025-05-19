@@ -33,7 +33,7 @@ export const getUserByIdPrController = async (req, res) => {
 };
 
 export const updateUserController = async (req, res) => {
-  const { userId } = req.user;
+  const { userId } = req.params;
   const data = req.body;
   const result = await updateUser(userId, data);
   result.success 

@@ -13,7 +13,7 @@ const router = express.Router();
 router.get('/users/all', getAllUsersController);  // router.get('/users', authMiddleware , getAllUsersController);
 router.get('/users/',authGuard , getUserByIdController);  // router.get('/users/:id', authMiddleware , getUserByIdController);
 router.get('/users/:id' , getUserByIdPrController);  // router.get('/users/:id', authMiddleware , getUserByIdController);
-router.put('/users/',authGuard, updateUserController);  // router.put('/users/:id', authMiddleware , updateUserController);
+router.put('/users/:userId', updateUserController);  // router.put('/users/:id', authMiddleware , updateUserController);
 router.delete('/users/', authGuard, deleteUserController);  // router.delete('/users/:id', authMiddleware , deleteUserController);
 
 export default router;

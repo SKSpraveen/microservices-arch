@@ -281,23 +281,32 @@ app.post('/update-driver-location', async (req, res) => {
 });
 
 // Track Order
-app.get('/track-order/:orderId', async (req, res) => {
-  try {
-    const { orderId } = req.params;
-    const trackOrder = await TrackOrder.findOne({ orderId });
-    if (!trackOrder) return res.status(404).json({ error: 'Order not found' });
+// app.get('/track-order/:orderId', async (req, res) => {
+//   try {
+//     const { orderId } = req.params;
+//     const trackOrder = await TrackOrder.findOne({ orderId });
+//     if (!trackOrder) return res.status(404).json({ error: 'Order not found' });
 
-    res.json({
-      status: trackOrder.status,
-      driverLocation: trackOrder.driverLocation,
-      hotelLocation: trackOrder.hotelLocation,
-      customerLocation: trackOrder.customerLocation,
-    });
-  } catch (error) {
-    console.error('Error fetching tracking data:', error);
-    res.status(500).json({ error: 'Failed to fetch tracking data' });
+//     res.json({
+//       status: trackOrder.status,
+//       driverLocation: trackOrder.driverLocation,
+//       hotelLocation: trackOrder.hotelLocation,
+//       customerLocation: trackOrder.customerLocation,
+//     });
+//   } catch (error) {
+//     console.error('Error fetching tracking data:', error);
+//     res.status(500).json({ error: 'Failed to fetch tracking data' });
+//   }
+// });
+
+// Track order
+app.get('/track-order/:id', async (req, res) => {
+  const trackOrder = await TrackOrder.findOne({ orderId: req.params.id })
+  if (!trackOrder) {
+    return res.status(404).json({ error: 'Order not found' })
   }
-});
+  res.json(trackOrder)
+})
 
 // CRUD Operations for Orders
 app.get('/orders/:orderId', async (req, res) => {
