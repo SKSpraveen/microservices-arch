@@ -197,11 +197,10 @@ export const logout = async (): Promise<void> => {
 
 export const getUserProfile = async (): Promise<any> => {
   try {
-    const response = await userAPI.get("/"); 
-    if (response.status === 200) {
-      return response.data; 
-    }
-    throw new Error(response.data.message || "Failed to fetch user profile.");
+    const userProfile = JSON.parse(localStorage.getItem("userProfile") as string);
+    const response = await userAPI.get("/" + userProfile._id); 
+    
+    return response.data; 
   } catch (error: any) {
     console.error("Get User Profile Failed:", error);
     throw error;

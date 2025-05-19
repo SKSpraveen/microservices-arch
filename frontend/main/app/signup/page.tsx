@@ -104,6 +104,7 @@ export default function SignInPage() {
     try {
       const response = await signup(formData);
       if (response?.data?.email) {
+        localStorage.setItem("userProfile", JSON.stringify(response.data));
         router.push(`/activation?email=${response.data.email}`);
       } else {
         throw new Error("Unexpected response from the server");
