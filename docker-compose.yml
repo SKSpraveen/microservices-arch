@@ -5,7 +5,7 @@ services:
     ports:
       - "3001:3000"
     environment:
-      - DB_URL=mongodb+srv://sksv:sksvD@cluster0.zychm.mongodb.net/userDB?retryWrites=true&w=majority&appName=Cluster0
+      - DB_URL=mongodb+srv://sksv:sksvD@cluster0.zychm.mongodb.net/authDB?retryWrites=true&w=majority&appName=Cluster0
     networks:
       - microservice-arch
     restart: always
@@ -16,7 +16,7 @@ services:
     ports:
       - "3002:3000"
     environment:
-      - DB_URL=mongodb+srv://sksv:sksvD@cluster0.zychm.mongodb.net/userDB?retryWrites=true&w=majority&appName=Cluster0
+      - DB_URL=mongodb+srv://sksv:sksvD@cluster0.zychm.mongodb.net/authDB?retryWrites=true&w=majority&appName=Cluster0
     networks:
       - microservice-arch
     restart: always
@@ -25,9 +25,9 @@ services:
   restaurant-service:
     build: ./backend/restaurant-service
     ports:
-      - "8081:8080"
+      - "3003:3000"
     environment:
-      - MONGO_URI=mongodb+srv://sksv:sksvD@cluster0.zychm.mongodb.net/userDB?retryWrites=true&w=majority&appName=Cluster0
+      - MONGO_URI=mongodb+srv://sksv:sksvD@cluster0.zychm.mongodb.net/hotelDB?retryWrites=true&w=majority&appName=Cluster0
     networks:
       - microservice-arch
     restart: always
@@ -36,9 +36,9 @@ services:
   order-service:
     build: ./backend/order-service
     ports:
-      - "8082:8080"
+      - "3005:3000"
     environment:
-      - MONGO_URI=mongodb+srv://sksv:sksvD@cluster0.zychm.mongodb.net/userDB?retryWrites=true&w=majority&appName=Cluster0
+      - MONGO_URI=mongodb+srv://sksv:sksvD@cluster0.zychm.mongodb.net/orderDB?retryWrites=true&w=majority&appName=Cluster0
     networks:
       - microservice-arch
     restart: always
@@ -47,9 +47,9 @@ services:
   payment-service:
     build: ./backend/payment-service
     ports:
-      - "4000:4000"
+      - "3006:3000"
     environment:
-      - MONGO_URI=mongodb+srv://sksv:sksvD@cluster0.zychm.mongodb.net/userDB?retryWrites=true&w=majority&appName=Cluster0
+      - MONGO_URI=mongodb+srv://sksv:sksvD@cluster0.zychm.mongodb.net/authDB?retryWrites=true&w=majority&appName=Cluster0
     networks:
       - microservice-arch
     restart: always
@@ -60,7 +60,7 @@ services:
     ports:
       - "4001:4000"
     environment:
-      - MONGO_URI=mongodb+srv://sksv:sksvD@cluster0.zychm.mongodb.net/userDB?retryWrites=true&w=majority&appName=Cluster0
+      - MONGO_URI=mongodb+srv://sksv:sksvD@cluster0.zychm.mongodb.net/authDB?retryWrites=true&w=majority&appName=Cluster0
     networks:
       - microservice-arch
     restart: always
@@ -71,7 +71,7 @@ services:
     ports:
       - "6001:6000"
     environment:
-      - MONGO_URI=mongodb+srv://sksv:sksvD@cluster0.zychm.mongodb.net/userDB?retryWrites=true&w=majority&appName=Cluster0
+      - MONGO_URI=mongodb+srv://sksv:sksvD@cluster0.zychm.mongodb.net/notificationDB?retryWrites=true&w=majority&appName=Cluster0
     networks:
       - microservice-arch
     restart: always
@@ -91,9 +91,9 @@ services:
   review-service:
     build: ./backend/review-service
     ports:
-      - "3009:3000"
+      - "3004:3000"
     environment:
-      - MONGO_URI=mongodb+srv://sksv:sksvD@cluster0.zychm.mongodb.net/userDB?retryWrites=true&w=majority&appName=Cluster0
+      - MONGO_URI=mongodb+srv://sksv:sksvD@cluster0.zychm.mongodb.net/review&feedbackDB?retryWrites=true&w=majority&appName=Cluster0
     networks:
       - microservice-arch
     restart: always

@@ -369,7 +369,7 @@ app.get("/order/orders/hotel/:hotelId", async (req, res) => {
     const { hotelId } = req.params;
     const orders = await Order.find({ hotelId });
     if (!orders.length)
-      return res.status(404).json({ error: "No orders found for this hotel" });
+      return res.status(203).json({ error: "No orders found for this hotel" });
 
     res.json(orders);
   } catch (error) {
