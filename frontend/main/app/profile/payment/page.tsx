@@ -29,7 +29,7 @@ export default function PaymentMethodsPage() {
   const [showPaymentForm, setShowPaymentForm] = useState(false)
   const [editingPaymentId, setEditingPaymentId] = useState<number | null>(null)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(null)
-  const [formData, setFormData] = useState<Omit<PaymentMethod, "id" | "lastFourDigits">>({
+  const [formData, setFormData] = useState<any>({
     type: "",
     cardNumber: "",
     expiryMonth: "",
@@ -74,13 +74,13 @@ export default function PaymentMethodsPage() {
 
     if (name === "cardNumber") {
       const formattedValue = value.replace(/\s/g, "").replace(/(.{4})/g, "$1 ").trim()
-      setFormData((prev) => ({
+      setFormData((prev:any) => ({
         ...prev,
         [name]: formattedValue,
         type: detectCardType(value.replace(/\s/g, "")),
       }))
     } else {
-      setFormData((prev) => ({ ...prev, [name]: value }))
+      setFormData((prev:any) => ({ ...prev, [name]: value }))
     }
 
     if (formErrors[name]) {
@@ -103,7 +103,7 @@ export default function PaymentMethodsPage() {
   }
 
   const handleDefaultChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({ ...prev, isDefault: e.target.checked }))
+    setFormData((prev:any) => ({ ...prev, isDefault: e.target.checked }))
   }
 
   const handleAddPayment = () => {

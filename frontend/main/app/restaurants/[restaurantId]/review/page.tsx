@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { MainNav } from "@/components/main-nav"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
@@ -21,7 +20,7 @@ export default function ReviewPage() {
   const [hoverRating, setHoverRating] = useState(0)
   const [reviewText, setReviewText] = useState("")
   const [title, setTitle] = useState("")
-  const [photos, setPhotos] = useState([])
+  const [photos, setPhotos] = useState<any[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Sample restaurant data
@@ -31,11 +30,11 @@ export default function ReviewPage() {
     image: "/placeholder.svg?height=100&width=100",
   }
 
-  const handleRatingChange = (value) => {
+  const handleRatingChange = (value:any) => {
     setRating(value)
   }
 
-  const handleMouseEnter = (value) => {
+  const handleMouseEnter = (value:any) => {
     setHoverRating(value)
   }
 
@@ -43,12 +42,12 @@ export default function ReviewPage() {
     setHoverRating(0)
   }
 
-  const handlePhotoUpload = (e) => {
+  const handlePhotoUpload = (e:any) => {
     const files = Array.from(e.target.files)
     if (files.length > 0) {
       // In a real app, you would upload these to a server
       // For now, we'll just create object URLs
-      const newPhotos = files.map((file) => ({
+      const newPhotos = files.map((file:any) => ({
         id: Math.random().toString(36).substring(7),
         url: URL.createObjectURL(file),
         name: file.name,
@@ -57,11 +56,11 @@ export default function ReviewPage() {
     }
   }
 
-  const removePhoto = (photoId) => {
+  const removePhoto = (photoId: any) => {
     setPhotos(photos.filter((photo) => photo.id !== photoId))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e:any)  => {
     e.preventDefault()
 
     if (rating === 0) {
@@ -88,7 +87,7 @@ export default function ReviewPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <MainNav />
+      {/* <MainNav /> */}
 
       <div className="container px-4 py-6">
         <Button variant="ghost" className="mb-4 -ml-2" onClick={() => router.back()}>
