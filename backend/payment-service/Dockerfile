@@ -17,7 +17,7 @@ RUN go build -o main .
 
 
 # Expose the port your app listens on
-EXPOSE 4000
+EXPOSE 3006
 
 # Run the app
 CMD ["./main"]

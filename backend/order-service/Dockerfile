@@ -17,5 +17,5 @@ WORKDIR /app
 # 2. Use wildcard for JAR name
 COPY --from=builder /app/target/*.jar app.jar 
 
-EXPOSE 8080
+EXPOSE 3005
 CMD ["java", "-jar", "app.jar"]
